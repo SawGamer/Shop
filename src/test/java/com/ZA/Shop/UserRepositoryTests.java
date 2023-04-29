@@ -1,5 +1,7 @@
 package com.ZA.Shop;
 
+import com.ZA.Shop.Interfaces.UserRepository;
+import com.ZA.Shop.database.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -29,7 +31,7 @@ public class UserRepositoryTests {
         user.setPassword("test2023");
         user.setFirstName("Zahir");
         user.setLastName("B");
-
+        user.setEnabled(true);
         User savedUser = repo.save(user);
 
         User existUser = entityManager.find(User.class, savedUser.getId());
