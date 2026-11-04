@@ -1,0 +1,173 @@
+@import "tailwindcss";
+
+/*
+  Z&A design tokens.
+  Paper and navy ink, cobalt for actions, sticker yellow for price tags.
+  One family (Archivo) in two widths: condensed for display, normal for reading.
+*/
+@theme {
+  --color-paper: #f2f3ef;
+  --color-white: #ffffff;
+  --color-ink: #17203b;
+  --color-ink-soft: #4a5270;
+  --color-ink-faint: #7a8098;
+  --color-mist: #dcdfe5;
+  --color-cloud: #e7e9ed;
+  --color-cobalt: #2b3fd6;
+  --color-cobalt-deep: #1f2fa8;
+  --color-sticker: #ffd23f;
+  --color-signal: #c42b3a;
+  --color-moss: #1d7a4c;
+
+  --font-sans: "Archivo Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.1rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.3rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.55rem;
+  --text-lg: 1.3125rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.5rem;
+  --text-xl--line-height: 1.9rem;
+  --text-2xl: 2.25rem;
+  --text-2xl--line-height: 2.25rem;
+  --text-3xl: 3rem;
+  --text-3xl--line-height: 2.9rem;
+  --text-4xl: 4.5rem;
+  --text-4xl--line-height: 4.1rem;
+
+  --radius-tag: 3px;
+  --radius-control: 6px;
+}
+
+/* Condensed display width: shoe-box labels and athletic type. */
+@utility font-condensed {
+  font-stretch: 70%;
+}
+@utility font-semicondensed {
+  font-stretch: 85%;
+}
+@utility headline {
+  font-stretch: 70%;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "tnum" 0;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-cobalt);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: var(--color-sticker);
+    color: var(--color-ink);
+  }
+  input,
+  select,
+  textarea,
+  button {
+    font: inherit;
+  }
+}
+
+/* Component classes live in a layer so Tailwind utilities (w-20, px-3…) can override them. */
+@layer components {
+  /* Tabular figures wherever numbers line up (prices, tables, size grids). */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Shared form controls. */
+  .field {
+    display: block;
+    width: 100%;
+    border: 1px solid var(--color-mist);
+    background: var(--color-white);
+    border-radius: var(--radius-control);
+    padding: 0.6rem 0.75rem;
+    color: var(--color-ink);
+  }
+  .field:focus {
+    border-color: var(--color-cobalt);
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-cobalt) 18%, transparent);
+  }
+  .field[aria-invalid="true"] {
+    border-color: var(--color-signal);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: var(--radius-control);
+    padding: 0.7rem 1.1rem;
+    font-weight: 650;
+    line-height: 1.2;
+    transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
+    cursor: pointer;
+  }
+  .btn:disabled,
+  .btn[aria-disabled="true"] {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+  .btn-primary {
+    background: var(--color-cobalt);
+    color: var(--color-white);
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: var(--color-cobalt-deep);
+  }
+  .btn-ink {
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+  .btn-ink:hover:not(:disabled) {
+    background: #222d52;
+  }
+  .btn-quiet {
+    background: transparent;
+    color: var(--color-ink);
+    border: 1px solid var(--color-mist);
+  }
+  .btn-quiet:hover:not(:disabled) {
+    border-color: var(--color-ink-faint);
+  }
+  .btn-danger {
+    background: transparent;
+    color: var(--color-signal);
+    border: 1px solid color-mix(in srgb, var(--color-signal) 35%, transparent);
+  }
+  .btn-danger:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--color-signal) 8%, transparent);
+  }
+  .btn-sm {
+    padding: 0.4rem 0.7rem;
+    font-size: var(--text-sm);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
