@@ -30,7 +30,7 @@ Principles:
 
 Demo: specs for all 12 electronics products and 3 running deals. Verified in a browser against the real API and covered by backend integration tests.
 
-## Phase 2 — Grocery delivery and pickup
+## Phase 2 — Grocery delivery and pickup (done)
 
 | Feature | What the customer gets | Backend | Storefront |
 |---|---|---|---|
@@ -42,7 +42,7 @@ Demo: specs for all 12 electronics products and 3 running deals. Verified in a b
 | Admin | manage all of the above | admin endpoints | fulfillment settings page (mode, hours, slots, zones, stores) |
 
 The fulfillment mode is a shop setting: `SHIPPING` (parcel delivery, today's behaviour) or `LOCAL`
-(delivery slots and pickup). Grocery demo: two delivery zones, two pickup stores, 1-hour slots.
+(delivery slots and pickup). Grocery demo: two delivery zones, two pickup stores, 1-hour slots. Verified in a browser against the real API and covered by backend integration tests.
 
 ## Phase 3 — Hardening for launch
 

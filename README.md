@@ -67,6 +67,21 @@ The electronics design adds the tools of a big electronics retailer:
 - **Compare** up to four products side by side, with a "show only differences" switch.
 - **Deals of the day:** percentage discounts with start and end time and a live countdown. The deal price applies in search, cart and checkout, and search entries refresh automatically when a deal starts or ends.
 
+### Grocery delivery and pickup
+
+A shop can run in **local fulfillment** mode (the grocery demo does): customers check whether you deliver to their postcode, then book a delivery time slot or pick up in a store.
+
+- **Delivery areas** by postcode prefix, each with its own fee, a free-delivery threshold and a minimum order. The longest matching prefix wins.
+- **Time slots** from an opening-hours schedule (slot length, capacity, lead time, how many days ahead). Slots cannot be overbooked: booking is a single conditional database update, and cancelling an order frees its slot.
+- **Click & collect** at your stores, with their own slot capacity and no minimum order.
+- **Cart and checkout** show the minimum order and free-delivery progress, and the delivery fee replaces the flat shipping fee.
+- **Buy again** puts a past order back into the cart as far as items are still available.
+- **Admin → Fulfillment** manages the mode, zones, stores and the slot schedule.
+
+| Checkout with time slots | Minimum order in the cart |
+|---|---|
+| ![Slots](docs/images/grocery-checkout-slots.jpg) | ![Minimum order](docs/images/grocery-cart-minimum.jpg) |
+
 ## Quick start
 
 Requirements: Docker with Compose v2.
