@@ -144,6 +144,10 @@ class CatalogAdminService {
                     input.group() == null || input.group().isBlank() ? null : input.group().trim(),
                     input.label().trim(), input.value().trim(), input.filterable()));
         }
+        // Hibernate inserts before it deletes; flush the removal first so a re-used key does not collide
+        // with the row it replaces (unique per product and key).
+        product.getSpecs().clear();
+        products.flush();
         product.replaceSpecs(specs);
         product.touch(clock.instant());
         changed(product);
