@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,6 +42,15 @@ class AuthController {
     }
 
     record VerifyEmailRequest(@NotBlank String token) {
+    }
+
+    record ForgotPasswordRequest(@NotBlank @Size(max = 254) String email) {
+    }
+
+    record ResetPasswordRequest(@NotBlank String token, @NotBlank @Size(min = 8, max = 72) String password) {
+    }
+
+    record DeleteAccountRequest(@NotBlank String password) {
     }
 
     record UserResponse(UUID id, String email, String firstName, String lastName, List<String> roles,
@@ -103,6 +113,24 @@ class AuthController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void resendVerification() {
         authService.resendVerification(CurrentUser.require().id());
+    }
+
+    @PostMapping("/auth/forgot-password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        authService.forgotPassword(request.email());
+    }
+
+    @PostMapping("/auth/reset-password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request.token(), request.password());
+    }
+
+    @DeleteMapping("/me")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void deleteAccount(@Valid @RequestBody DeleteAccountRequest request) {
+        authService.deleteAccount(CurrentUser.require().id(), request.password());
     }
 
     @GetMapping("/me")

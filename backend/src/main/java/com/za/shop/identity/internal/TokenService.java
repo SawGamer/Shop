@@ -83,6 +83,15 @@ class TokenService {
                 .ifPresent(token -> refreshTokens.revokeFamily(token.getFamilyId(), clock.instant()));
     }
 
+    /**
+     * Ends every login session of the user. The tokens are marked as revoked long enough ago to be outside the
+     * reuse grace window, so replaying one of them fails instead of being tolerated.
+     */
+    @Transactional
+    void revokeAllSessions(UUID userId) {
+        refreshTokens.revokeAllForUser(userId, clock.instant().minus(properties.refreshReuseGrace()).minusSeconds(1));
+    }
+
     @Scheduled(cron = "${shop.identity.cleanup-cron:0 17 3 * * *}")
     @Transactional
     public void deleteExpiredTokens() {

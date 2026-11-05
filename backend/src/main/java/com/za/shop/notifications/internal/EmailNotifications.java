@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.HtmlUtils;
 import org.springframework.web.util.UriUtils;
 
+import com.za.shop.identity.PasswordResetRequested;
 import com.za.shop.identity.VerificationEmailRequested;
 import com.za.shop.orders.OrderEvents;
 import com.za.shop.settings.ShopSettingsService;
@@ -56,6 +57,19 @@ class EmailNotifications {
                 <p><a href="%s" style="background:#111;color:#fff;padding:12px 20px;border-radius:6px;\
                 text-decoration:none">Confirm email</a></p>
                 <p style="color:#666">If you did not create an account you can ignore this email.</p>
+                """.formatted(esc(event.firstName()), esc(settings.current().name()), esc(link)));
+    }
+
+    @ApplicationModuleListener
+    void on(PasswordResetRequested event) {
+        String link = shop.storefrontUrl() + "/reset-password?token="
+                + UriUtils.encodeQueryParam(event.token(), java.nio.charset.StandardCharsets.UTF_8);
+        send(event.email(), "Reset your password", """
+                <p>Hi %s,</p>
+                <p>we received a request to reset the password of your %s account. This link works for one hour:</p>
+                <p><a href="%s" style="background:#111;color:#fff;padding:12px 20px;border-radius:6px;\
+                text-decoration:none">Choose a new password</a></p>
+                <p style="color:#666">If you did not ask for this, you can ignore this email: your password stays as it is.</p>
                 """.formatted(esc(event.firstName()), esc(settings.current().name()), esc(link)));
     }
 

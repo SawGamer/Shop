@@ -357,6 +357,59 @@ type Schedule = {
 }
 ```
 
+## Customer accounts and content pages (Phase 3)
+
+### Password reset
+
+| Method & path | Auth | Body | Response |
+|---|---|---|---|
+| `POST /auth/forgot-password` | – | `{ email }` | `204` always, whether or not the email exists (no account enumeration) |
+| `POST /auth/reset-password` | – | `{ token, password (8–72 chars) }` | `204`; `401 INVALID_TOKEN` when the token is wrong, used or older than 1 hour |
+
+The email contains `{STOREFRONT_URL}/reset-password?token=…`. At most one reset email is sent per account per
+minute. A successful reset signs the account out everywhere (all refresh tokens are revoked), marks the email as
+verified, and invalidates every other open reset link.
+
+### Saved addresses
+
+```ts
+type SavedAddress = Address & { id: string; label: string | null; isDefault: boolean }  // Address as in the shared types
+type SavedAddressInput = Address & { label?: string | null; isDefault?: boolean }
+```
+
+| Method & path | Body | Response |
+|---|---|---|
+| `GET /me/addresses` | – | `200 SavedAddress[]` (default first, then newest) |
+| `POST /me/addresses` | `SavedAddressInput` | `201 SavedAddress`; `409 ADDRESS_LIMIT` beyond 10 addresses |
+| `PUT /me/addresses/{id}` | `SavedAddressInput` | `200 SavedAddress` |
+| `DELETE /me/addresses/{id}` | – | `204` |
+
+The first address becomes the default automatically. Marking one as default unsets the previous default;
+deleting the default promotes the newest remaining address. Other customers' addresses answer `404`.
+
+### Deleting the account
+
+`DELETE /me` with `{ password }` → `204`. `401 INVALID_CREDENTIALS` for a wrong password; `403 FORBIDDEN` for admin
+accounts. Personal data is erased: name, email (replaced by a placeholder), saved addresses, tokens and the cart.
+Orders are kept (tax retention) and keep the email address used at the time, but can no longer be reached by a login.
+
+### Content pages (imprint, terms, privacy, returns)
+
+```ts
+type PageSlug = "imprint" | "terms" | "privacy" | "returns"
+type PageSummary = { slug: PageSlug; title: string; isTemplate: boolean }
+type ContentPage = PageSummary & { body: string; updatedAt: string | null }
+```
+
+`body` is plain text: paragraphs are separated by a blank line and a line starting with `## ` is a heading. No HTML.
+Until the shop owner saves a page it holds a starter template and `isTemplate` is `true`.
+
+| Method & path | Auth | Body | Response |
+|---|---|---|---|
+| `GET /pages` | – (cacheable 60 s) | – | `200 PageSummary[]` |
+| `GET /pages/{slug}` | – (cacheable 60 s) | – | `200 ContentPage` |
+| `PUT /admin/pages/{slug}` | admin | `{ title (1–120), body (≤ 50 000) }` | `200 ContentPage` (`isTemplate` becomes `false`) |
+
 ## Shop settings and design
 
 One row of settings describes the shop: its name and the storefront design. The backend only stores and

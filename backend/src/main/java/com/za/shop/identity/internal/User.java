@@ -47,6 +47,8 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Set<Role> roles = new HashSet<>();
 
+    private Instant deletedAt;
+
     private Instant createdAt;
 
     private Instant updatedAt;
@@ -64,6 +66,22 @@ public class User {
         this.lastName = lastName;
         this.roles.add(Role.CUSTOMER);
         this.createdAt = now;
+        this.updatedAt = now;
+    }
+
+    public void changePassword(String newPasswordHash, Instant now) {
+        this.passwordHash = newPasswordHash;
+        this.updatedAt = now;
+    }
+
+    /** Erases the personal data. The row stays so that orders keep a valid (but unreachable) owner. */
+    public void anonymize(String placeholderEmail, String unusablePasswordHash, Instant now) {
+        this.email = placeholderEmail;
+        this.passwordHash = unusablePasswordHash;
+        this.firstName = "Deleted";
+        this.lastName = "customer";
+        this.emailVerified = false;
+        this.deletedAt = now;
         this.updatedAt = now;
     }
 
