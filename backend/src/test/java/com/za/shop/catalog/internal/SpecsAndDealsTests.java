@@ -100,7 +100,8 @@ class SpecsAndDealsTests extends IntegrationTest {
 
         await().atMost(Duration.ofSeconds(30)).untilAsserted(() -> mvc.perform(get("/api/v1/products").param("q", word))
                 .andExpect(jsonPath("$.totalItems").value(3))
-                .andExpect(jsonPath("$.facets.specs[?(@.key=='ram')].values[*].count").exists())
+                // wait until the specs of all three products are indexed (each update is a separate event)
+                .andExpect(jsonPath("$.facets.specs[?(@.key=='ram')].values[0].count").value(contains(2)))
                 .andExpect(jsonPath("$.items[?(@.slug=='" + a.slug() + "')].highlights[0]").value(contains("6.4″ Screen size"))));
 
         MvcResult all = mvc.perform(get("/api/v1/products").param("q", word)).andReturn();
