@@ -1,0 +1,43 @@
+import type { Theme } from "./types";
+
+/** Graphite and electric blue, a crisp geometric sans and spec chips everywhere. */
+export const electronics: Theme = {
+  id: "electronics",
+  name: "Electronics",
+  description: "Graphite header, electric blue, a product spotlight and capacity chips on every card.",
+  themeColor: "#0f1217",
+  preview: { paper: "#f4f5f7", ink: "#0f1217", accent: "#1f5cff", highlight: "#b6f23a", font: '"Space Grotesk Variable", sans-serif', sample: "1 TB" },
+  labels: {
+    size: "Capacity",
+    sizeShort: "Capacity",
+    color: "Colour",
+    choose: "Choose a capacity",
+    noun: ["product", "products"],
+    searchPlaceholder: "Search phones, laptops, audio…",
+    searchLabel: "Search products",
+    allProducts: "All products",
+  },
+  copy: {
+    heroEyebrow: "Just landed",
+    heroTitle: "The latest tech, shipped tomorrow.",
+    heroSub: "Phones, laptops and audio from the brands you trust, with free shipping over €50.",
+    primaryCta: "Shop now",
+    secondaryCta: "Browse all products",
+    categoriesTitle: "Shop by category",
+    newTitle: "Latest gear",
+    newLink: "See everything new",
+    saleTitle: "Deals",
+    saleLink: "See all deals",
+    emptyCatalog: "No products yet. Add products in the admin area to see them here.",
+    noResults: "No products match",
+    noResultsHint: "Remove a filter or try a broader search, like a brand or “laptop”.",
+    emptyCart: "Your cart is empty",
+    emptyCartHint: "Add a device and it will wait here while you compare.",
+    firstOrder: "Find your next device",
+    aboutProduct: "Overview",
+    footerLine: "Phones, computers, audio and smart home — with honest prices.",
+    metaDescription: "Phones, laptops, audio and smart home devices.",
+    announcement: null,
+  },
+  layout: { header: "tech", card: "tech", sizeOptions: "chips", colorOptions: "chips", buyBox: "card", megaMenu: true, compareOnCards: true },
+};

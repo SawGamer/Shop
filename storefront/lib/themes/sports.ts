@@ -1,0 +1,43 @@
+import type { Theme } from "./types";
+
+/** Charcoal, signal orange and a lime highlight; condensed athletic type, activity tiles, dark header. */
+export const sports: Theme = {
+  id: "sports",
+  name: "Sports & outdoor",
+  description: "Charcoal with signal orange and lime, condensed athletic type, activity tiles and a spotlight product.",
+  themeColor: "#14181a",
+  preview: { paper: "#eff1ec", ink: "#14181a", accent: "#d44a0a", highlight: "#c6f432", font: '"Barlow Condensed", sans-serif', sample: "Go further" },
+  labels: {
+    size: "Size",
+    sizeShort: "Size",
+    color: "Colour",
+    choose: "Choose a size",
+    noun: ["product", "products"],
+    searchPlaceholder: "Search boots, tents, running…",
+    searchLabel: "Search gear",
+    allProducts: "All gear",
+  },
+  copy: {
+    heroEyebrow: "New this season",
+    heroTitle: "Gear for the long way round.",
+    heroSub: "Tents, boots, bikes and trail kit, picked by people who use them.",
+    primaryCta: "Shop the spotlight",
+    secondaryCta: "Browse all gear",
+    categoriesTitle: "Shop by activity",
+    newTitle: "Just landed",
+    newLink: "See what's new",
+    saleTitle: "Trail sale",
+    saleLink: "All sale gear",
+    emptyCatalog: "No gear yet. Add products in the admin area to fill the shelves.",
+    noResults: "No gear matches",
+    noResultsHint: "Try a broader search, like “jacket” or “tent”.",
+    emptyCart: "Your pack is empty",
+    emptyCartHint: "Add something and it will wait here while you plan the route.",
+    firstOrder: "Kit out your first trip",
+    aboutProduct: "About this gear",
+    footerLine: "Outdoor and sports gear, tested on real trails.",
+    metaDescription: "Outdoor and sports gear for camping, hiking, running and cycling.",
+    announcement: "Free shipping over €75 · 30-day returns, even after a muddy test run",
+  },
+  layout: { header: "sport", card: "sport", sizeOptions: "chips", colorOptions: "swatches", buyBox: "card", megaMenu: true, compareOnCards: false },
+};

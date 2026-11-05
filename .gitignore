@@ -1,0 +1,15 @@
+# OS / editors
+.DS_Store
+.idea/
+*.iml
+.vscode/
+
+# Backend
+backend/target/
+backend/data/
+
+# Secrets (JWT keys, local env files)
+*.pem
+.env
+.env.*
+!.env.example

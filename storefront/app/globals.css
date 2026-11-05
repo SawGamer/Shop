@@ -1,0 +1,379 @@
+@import "tailwindcss";
+
+/*
+  Z&A design tokens.
+  Paper and navy ink, cobalt for actions, sticker yellow for price tags.
+  One family (Archivo) in two widths: condensed for display, normal for reading.
+*/
+@theme {
+  --color-paper: #f2f3ef;
+  --color-white: #ffffff;
+  --color-ink: #17203b;
+  --color-ink-soft: #4a5270;
+  --color-ink-faint: #7a8098;
+  --color-mist: #dcdfe5;
+  --color-cloud: #e7e9ed;
+  --color-cobalt: #2b3fd6;
+  --color-cobalt-deep: #1f2fa8;
+  --color-sticker: #ffd23f;
+  --color-signal: #c42b3a;
+  --color-moss: #1d7a4c;
+
+  --font-sans: "Archivo Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.1rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.3rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.55rem;
+  --text-lg: 1.3125rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.5rem;
+  --text-xl--line-height: 1.9rem;
+  --text-2xl: 2.25rem;
+  --text-2xl--line-height: 2.25rem;
+  --text-3xl: 3rem;
+  --text-3xl--line-height: 2.9rem;
+  --text-4xl: 4.5rem;
+  --text-4xl--line-height: 4.1rem;
+
+  --radius-tag: 3px;
+  --radius-control: 6px;
+}
+
+/* Condensed display width: shoe-box labels and athletic type. */
+@utility font-condensed {
+  font-stretch: 70%;
+}
+@utility font-semicondensed {
+  font-stretch: 85%;
+}
+/* Display type is set per design (see the [data-theme] blocks below). */
+@utility headline {
+  font-family: var(--display-font);
+  font-stretch: var(--display-stretch);
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-tracking);
+  font-style: var(--display-style);
+}
+@utility font-display {
+  font-family: var(--display-font);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "tnum" 0;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-cobalt);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: var(--color-sticker);
+    color: var(--color-ink);
+  }
+  input,
+  select,
+  textarea,
+  button {
+    font: inherit;
+  }
+}
+
+/* Component classes live in a layer so Tailwind utilities (w-20, px-3…) can override them. */
+@layer components {
+  /* Tabular figures wherever numbers line up (prices, tables, size grids). */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Shared form controls. */
+  .field {
+    display: block;
+    width: 100%;
+    border: 1px solid var(--color-mist);
+    background: var(--color-white);
+    border-radius: var(--radius-control);
+    padding: 0.6rem 0.75rem;
+    color: var(--color-ink);
+  }
+  .field:focus {
+    border-color: var(--color-cobalt);
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-cobalt) 18%, transparent);
+  }
+  .field[aria-invalid="true"] {
+    border-color: var(--color-signal);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: var(--radius-control);
+    padding: 0.7rem 1.1rem;
+    font-weight: 650;
+    line-height: 1.2;
+    transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
+    cursor: pointer;
+  }
+  .btn:disabled,
+  .btn[aria-disabled="true"] {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+  .btn-primary {
+    background: var(--color-cobalt);
+    color: var(--color-white);
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: var(--color-cobalt-deep);
+  }
+  .btn-ink {
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+  .btn-ink:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--color-ink) 86%, white);
+  }
+  .btn-quiet {
+    background: transparent;
+    color: var(--color-ink);
+    border: 1px solid var(--color-mist);
+  }
+  .btn-quiet:hover:not(:disabled) {
+    border-color: var(--color-ink-faint);
+  }
+  .btn-danger {
+    background: transparent;
+    color: var(--color-signal);
+    border: 1px solid color-mix(in srgb, var(--color-signal) 35%, transparent);
+  }
+  .btn-danger:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--color-signal) 8%, transparent);
+  }
+  .btn-sm {
+    padding: 0.4rem 0.7rem;
+    font-size: var(--text-sm);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/*
+  Designs. Each block re-declares the tokens above, so every Tailwind utility (bg-paper, text-ink,
+  bg-cobalt…) follows the design. Unlayered on purpose: these beat Tailwind's layered @theme values.
+  "cobalt" is the accent (actions), "sticker" the highlight (savings), "ink" text and dark surfaces.
+*/
+:root,
+[data-theme="footwear"] {
+  --color-paper: #f2f3ef;
+  --color-white: #ffffff;
+  --color-ink: #17203b;
+  --color-ink-soft: #4a5270;
+  --color-ink-faint: #7a8098;
+  --color-mist: #dcdfe5;
+  --color-cloud: #e7e9ed;
+  --color-cobalt: #2b3fd6;
+  --color-cobalt-deep: #1f2fa8;
+  --color-sticker: #ffd23f;
+  --color-signal: #c42b3a;
+  --color-moss: #1d7a4c;
+  --font-sans: "Archivo Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --display-font: var(--font-sans);
+  --display-stretch: 70%;
+  --display-weight: 800;
+  --display-tracking: -0.01em;
+  --display-style: normal;
+  --radius-tag: 3px;
+  --radius-control: 6px;
+}
+
+[data-theme="electronics"] {
+  --color-paper: #f4f5f7;
+  --color-white: #ffffff;
+  --color-ink: #0f1217;
+  --color-ink-soft: #4a5361;
+  --color-ink-faint: #737c8c;
+  --color-mist: #dde1e7;
+  --color-cloud: #e9ecf1;
+  --color-cobalt: #1f5cff;
+  --color-cobalt-deep: #1745c4;
+  --color-sticker: #b6f23a;
+  --color-signal: #d0312d;
+  --color-moss: #0f7a55;
+  --font-sans: "Space Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
+  --display-font: var(--font-sans);
+  --display-stretch: 100%;
+  --display-weight: 700;
+  --display-tracking: -0.025em;
+  --display-style: normal;
+  --radius-tag: 12px;
+  --radius-control: 10px;
+}
+
+[data-theme="grocery"] {
+  --color-paper: #fbf7ec;
+  --color-white: #ffffff;
+  --color-ink: #1d3a26;
+  --color-ink-soft: #4a5f50;
+  --color-ink-faint: #75867a;
+  --color-mist: #e5dfcc;
+  --color-cloud: #f1ebd9;
+  --color-cobalt: #23773b;
+  --color-cobalt-deep: #195a2c;
+  --color-sticker: #ffcc33;
+  --color-signal: #c43c22;
+  --color-moss: #23773b;
+  --font-sans: "Nunito Variable", ui-rounded, ui-sans-serif, system-ui, sans-serif;
+  --display-font: var(--font-sans);
+  --display-stretch: 100%;
+  --display-weight: 900;
+  --display-tracking: -0.015em;
+  --display-style: normal;
+  --radius-tag: 16px;
+  --radius-control: 12px;
+}
+
+[data-theme="home"] {
+  --color-paper: #f3eee6;
+  --color-white: #fffdf9;
+  --color-ink: #2a2521;
+  --color-ink-soft: #5f564e;
+  --color-ink-faint: #877c72;
+  --color-mist: #ddd4c6;
+  --color-cloud: #e9e1d4;
+  --color-cobalt: #7a4f33;
+  --color-cobalt-deep: #5c3a24;
+  --color-sticker: #ead5b3;
+  --color-signal: #9e3a2b;
+  --color-moss: #4c6b37;
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --display-font: "Fraunces Variable", ui-serif, Georgia, serif;
+  --display-stretch: 100%;
+  --display-weight: 380;
+  --display-tracking: -0.02em;
+  --display-style: normal;
+  --radius-tag: 0px;
+  --radius-control: 2px;
+}
+
+[data-theme="beauty"] {
+  --color-paper: #fbf3f1;
+  --color-white: #ffffff;
+  --color-ink: #3b2331;
+  --color-ink-soft: #6b5060;
+  --color-ink-faint: #957b89;
+  --color-mist: #eedadd;
+  --color-cloud: #f6e6e7;
+  --color-cobalt: #a3405f;
+  --color-cobalt-deep: #82304b;
+  --color-sticker: #f9d3dc;
+  --color-signal: #b0263d;
+  --color-moss: #3c7a5f;
+  --font-sans: "Jost Variable", ui-sans-serif, system-ui, sans-serif;
+  --display-font: "Cormorant Garamond", ui-serif, Georgia, serif;
+  --display-stretch: 100%;
+  --display-weight: 500;
+  --display-tracking: -0.005em;
+  --display-style: normal;
+  --radius-tag: 18px;
+  --radius-control: 999px;
+}
+
+[data-theme="sports"] {
+  --color-paper: #eff1ec;
+  --color-white: #ffffff;
+  --color-ink: #14181a;
+  --color-ink-soft: #485056;
+  --color-ink-faint: #727a80;
+  --color-mist: #d9ddd8;
+  --color-cloud: #e4e7e2;
+  --color-cobalt: #d44a0a;
+  --color-cobalt-deep: #a83a07;
+  --color-sticker: #c6f432;
+  --color-signal: #c8201e;
+  --color-moss: #2f7d3a;
+  --font-sans: "Barlow", ui-sans-serif, system-ui, sans-serif;
+  --display-font: "Barlow Condensed", "Barlow", ui-sans-serif, sans-serif;
+  --display-stretch: 100%;
+  --display-weight: 800;
+  --display-tracking: 0.005em;
+  --display-style: normal;
+  --radius-tag: 2px;
+  --radius-control: 4px;
+}
+
+[data-theme="books"] {
+  --color-paper: #f5f2ec;
+  --color-white: #fffefb;
+  --color-ink: #1b2438;
+  --color-ink-soft: #4a5368;
+  --color-ink-faint: #787f92;
+  --color-mist: #ddd8cd;
+  --color-cloud: #e9e5db;
+  --color-cobalt: #7d1d3a;
+  --color-cobalt-deep: #5e1429;
+  --color-sticker: #e9c46a;
+  --color-signal: #b3261e;
+  --color-moss: #3c6e4f;
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --display-font: "Source Serif 4 Variable", ui-serif, Georgia, serif;
+  --display-stretch: 100%;
+  --display-weight: 600;
+  --display-tracking: -0.012em;
+  --display-style: normal;
+  --radius-tag: 2px;
+  --radius-control: 4px;
+}
+
+[data-theme="gourmet"] {
+  --color-paper: #f7efe6;
+  --color-white: #fffaf4;
+  --color-ink: #3a2218;
+  --color-ink-soft: #684b3d;
+  --color-ink-faint: #94796a;
+  --color-mist: #e8d8c8;
+  --color-cloud: #f0e2d2;
+  --color-cobalt: #b3214f;
+  --color-cobalt-deep: #8e1a3f;
+  --color-sticker: #f2c46d;
+  --color-signal: #b3261e;
+  --color-moss: #5b7a3a;
+  --font-sans: "DM Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --display-font: "DM Serif Display", ui-serif, Georgia, serif;
+  --display-stretch: 100%;
+  --display-weight: 400;
+  --display-tracking: 0;
+  --display-style: normal;
+  --radius-tag: 22px;
+  --radius-control: 14px;
+}
+
+/* The body font follows the design (set on <html>, so nested design wrappers like /admin can reset it). */
+[data-theme] {
+  font-family: var(--font-sans);
+}
+
+/* /compare: "Show only differences" hides rows where every product has the same value. */
+.compare-only-diff tr.compare-row[data-same] {
+  display: none;
+}

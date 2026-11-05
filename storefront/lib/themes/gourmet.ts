@@ -1,0 +1,43 @@
+import type { Theme } from "./types";
+
+/** Cocoa and cream with raspberry; a high-contrast display serif and big, appetising cards. */
+export const gourmet: Theme = {
+  id: "gourmet",
+  name: "Gourmet & sweets",
+  description: "Cocoa and cream with raspberry, a display serif, big appetising cards and a pickup-and-delivery band.",
+  themeColor: "#3a2218",
+  preview: { paper: "#f7efe6", ink: "#3a2218", accent: "#b3214f", highlight: "#f2c46d", font: '"DM Serif Display", serif', sample: "Taste it" },
+  labels: {
+    size: "Portion",
+    sizeShort: "Portion",
+    color: "Flavour",
+    choose: "Choose a portion",
+    noun: ["treat", "treats"],
+    searchPlaceholder: "Search pralines, cakes, pizza…",
+    searchLabel: "Search the menu",
+    allProducts: "The full menu",
+  },
+  copy: {
+    heroEyebrow: "Baked and made today",
+    heroTitle: "Made by hand, ready when you are.",
+    heroSub: "Chocolates, cakes and warm dishes from our kitchen, for pickup or delivery.",
+    primaryCta: "Order today's favourite",
+    secondaryCta: "See the full menu",
+    categoriesTitle: "From our kitchen",
+    newTitle: "Fresh from the kitchen",
+    newLink: "See the full menu",
+    saleTitle: "Sweet offers",
+    saleLink: "All offers",
+    emptyCatalog: "The menu is empty. Add products in the admin area to fill the counter.",
+    noResults: "Nothing on the menu matches",
+    noResultsHint: "Try a broader search, like “chocolate” or “cake”.",
+    emptyCart: "Your order is empty",
+    emptyCartHint: "Add something tasty and it will wait here while you browse.",
+    firstOrder: "Start your first order",
+    aboutProduct: "About this treat",
+    footerLine: "Small-batch chocolate, bakes and kitchen classics.",
+    metaDescription: "Handmade chocolate, cakes, pastries and take-away dishes for pickup or delivery.",
+    announcement: "Order by 2 pm for same-day delivery · Pick up in store, free",
+  },
+  layout: { header: "boutique", card: "treat", sizeOptions: "chips", colorOptions: "swatches", buyBox: "card", megaMenu: false, compareOnCards: false },
+};

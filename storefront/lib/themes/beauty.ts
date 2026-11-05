@@ -1,0 +1,43 @@
+import type { Theme } from "./types";
+
+/** Soft blush and plum, an elegant serif with a clean sans, shade swatches. */
+export const beauty: Theme = {
+  id: "beauty",
+  name: "Beauty",
+  description: "Soft blush tones, an elegant serif, a centred logo, routines and shade swatches.",
+  themeColor: "#3b2331",
+  preview: { paper: "#fbf3f1", ink: "#3b2331", accent: "#a3405f", highlight: "#f9d3dc", font: '"Cormorant Garamond", serif', sample: "Rose" },
+  labels: {
+    size: "Size",
+    sizeShort: "Size",
+    color: "Shade",
+    choose: "Choose a size",
+    noun: ["product", "products"],
+    searchPlaceholder: "Search serums, lipstick, fragrance…",
+    searchLabel: "Search beauty",
+    allProducts: "All beauty",
+  },
+  copy: {
+    heroEyebrow: "Clean beauty, kindly made",
+    heroTitle: "Skin first. Then everything else.",
+    heroSub: "Gentle skincare, long-wear colour and fragrances layered like a memory.",
+    primaryCta: "Shop bestsellers",
+    secondaryCta: "Find your routine",
+    categoriesTitle: "Shop by category",
+    newTitle: "Bestsellers",
+    newLink: "Shop all",
+    saleTitle: "Little treats",
+    saleLink: "All offers",
+    emptyCatalog: "Nothing here yet. Add products in the admin area to show them here.",
+    noResults: "Nothing matches",
+    noResultsHint: "Try a broader word, like “serum” or “lip”.",
+    emptyCart: "Your bag is empty",
+    emptyCartHint: "Your favourites will wait here while you keep browsing.",
+    firstOrder: "Discover bestsellers",
+    aboutProduct: "Why you'll love it",
+    footerLine: "Skincare, makeup and fragrance, thoughtfully formulated.",
+    metaDescription: "Skincare, makeup and fragrance.",
+    announcement: "Free samples with every order · Free shipping over €50",
+  },
+  layout: { header: "boutique", card: "boutique", sizeOptions: "chips", colorOptions: "swatches", buyBox: "card", megaMenu: false, compareOnCards: false },
+};
