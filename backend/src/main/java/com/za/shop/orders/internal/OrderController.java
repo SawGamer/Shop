@@ -32,9 +32,11 @@ class OrderController {
     private final OrderService orderService;
     private final OrderQueries queries;
     private final PaymentService payments;
+    private final OrderReorder reorder;
 
     OrderController(CheckoutService checkout, OrderService orderService, OrderQueries queries,
-            PaymentService payments) {
+            PaymentService payments, OrderReorder reorder) {
+        this.reorder = reorder;
         this.checkout = checkout;
         this.orderService = orderService;
         this.queries = queries;
@@ -44,7 +46,8 @@ class OrderController {
     @PostMapping("/api/v1/checkout")
     @ResponseStatus(HttpStatus.CREATED)
     CheckoutResponse checkout(@Valid @RequestBody CheckoutRequest request) {
-        var result = checkout.checkout(CurrentUser.require(), request.shippingAddress().toAddress());
+        var result = checkout.checkout(CurrentUser.require(), request.shippingAddress().toAddress(),
+                request.fulfillment());
         return new CheckoutResponse(result.orderId(), result.orderNumber(), result.paymentUrl());
     }
 
@@ -57,6 +60,11 @@ class OrderController {
     @GetMapping("/api/v1/orders/{id}")
     OrderDto myOrder(@PathVariable UUID id) {
         return queries.ofCustomer(CurrentUser.require().id(), id);
+    }
+
+    @PostMapping("/api/v1/orders/{id}/reorder")
+    OrderReorder.Result reorder(@PathVariable UUID id) {
+        return reorder.reorder(CurrentUser.require().id(), id);
     }
 
     @GetMapping("/api/v1/admin/orders")

@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+import com.za.shop.fulfillment.FulfillmentMethod;
 import com.za.shop.orders.OrderStatus;
 import com.za.shop.orders.OrderSummaryView;
 import com.za.shop.shared.Money;
@@ -43,7 +44,18 @@ final class OrderDtos {
         }
     }
 
-    record CheckoutRequest(@NotNull @Valid AddressDto shippingAddress) {
+    record FulfillmentChoice(@NotNull FulfillmentMethod method, @NotBlank String slotId, UUID locationId) {
+    }
+
+    /** {@code fulfillment} is required in LOCAL mode (delivery slots / pickup) and ignored otherwise. */
+    record CheckoutRequest(@NotNull @Valid AddressDto shippingAddress, @Valid FulfillmentChoice fulfillment) {
+    }
+
+    record FulfillmentSlotDto(Instant startsAt, Instant endsAt) {
+    }
+
+    record FulfillmentDto(FulfillmentMethod method, FulfillmentSlotDto slot, String zoneName, Long feeCents,
+            String locationName) {
     }
 
     record CheckoutResponse(UUID orderId, String orderNumber, String paymentUrl) {
@@ -58,7 +70,8 @@ final class OrderDtos {
 
     record OrderDto(UUID id, String orderNumber, OrderStatus status, String customerEmail, List<OrderLineDto> lines,
             Money subtotal, Money shipping, Money total, AddressDto shippingAddress, Instant createdAt, Instant paidAt,
-            Instant shippedAt, Instant deliveredAt, Instant cancelledAt, String paymentUrl) {
+            Instant shippedAt, Instant deliveredAt, Instant cancelledAt, String paymentUrl,
+            FulfillmentDto fulfillment) {
 
         static OrderDto of(Order o) {
             String c = o.getCurrency();
@@ -70,8 +83,19 @@ final class OrderDtos {
                     Money.of(o.getSubtotalCents(), c), Money.of(o.getShippingCents(), c),
                     Money.of(o.getTotalCents(), c), AddressDto.of(o.getShippingAddress()), o.getCreatedAt(),
                     o.getPaidAt(), o.getShippedAt(), o.getDeliveredAt(), o.getCancelledAt(),
-                    o.getStatus() == OrderStatus.PENDING_PAYMENT ? o.getPaymentUrl() : null);
+                    o.getStatus() == OrderStatus.PENDING_PAYMENT ? o.getPaymentUrl() : null, fulfillmentOf(o));
         }
+    }
+
+    private static FulfillmentDto fulfillmentOf(Order o) {
+        if (o.getFulfillmentMethod() == null) {
+            return null;
+        }
+        FulfillmentMethod method = FulfillmentMethod.valueOf(o.getFulfillmentMethod());
+        boolean delivery = method == FulfillmentMethod.DELIVERY;
+        return new FulfillmentDto(method, new FulfillmentSlotDto(o.getSlotStartsAt(), o.getSlotEndsAt()),
+                delivery ? o.getFulfillmentLabel() : null, delivery ? o.getShippingCents() : null,
+                delivery ? null : o.getFulfillmentLabel());
     }
 
     static OrderSummaryView summary(Order o) {

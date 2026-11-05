@@ -63,7 +63,7 @@ class SecurityConfig {
                         .requestMatchers("/api/v1/auth/resend-verification").authenticated()
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/products/**", "/api/v1/categories/**",
-                                "/api/v1/brands/**", "/api/v1/shop").permitAll()
+                                "/api/v1/brands/**", "/api/v1/shop", "/api/v1/fulfillment/**").permitAll()
                         .requestMatchers("/api/v1/cart/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/payments/stripe/webhook").permitAll()
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")

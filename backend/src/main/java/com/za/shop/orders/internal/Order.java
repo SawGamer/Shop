@@ -59,6 +59,16 @@ public class Order {
 
     private String paymentUrl;
 
+    private String fulfillmentMethod;
+
+    private String fulfillmentSlotKey;
+
+    private Instant slotStartsAt;
+
+    private Instant slotEndsAt;
+
+    private String fulfillmentLabel;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("position asc")
     private List<OrderLine> lines = new ArrayList<>();
@@ -103,6 +113,14 @@ public class Order {
                 imageUrl, unitPriceCents, quantity));
         subtotalCents = lines.stream().mapToLong(OrderLine::getLineTotalCents).sum();
         totalCents = subtotalCents + shippingCents;
+    }
+
+    void setFulfillment(String method, String slotKey, Instant startsAt, Instant endsAt, String label) {
+        this.fulfillmentMethod = method;
+        this.fulfillmentSlotKey = slotKey;
+        this.slotStartsAt = startsAt;
+        this.slotEndsAt = endsAt;
+        this.fulfillmentLabel = label;
     }
 
     void attachPayment(UUID paymentSessionId, String paymentUrl, Instant now) {
@@ -189,6 +207,26 @@ public class Order {
 
     public ShippingAddress getShippingAddress() {
         return shippingAddress;
+    }
+
+    public String getFulfillmentMethod() {
+        return fulfillmentMethod;
+    }
+
+    public String getFulfillmentSlotKey() {
+        return fulfillmentSlotKey;
+    }
+
+    public Instant getSlotStartsAt() {
+        return slotStartsAt;
+    }
+
+    public Instant getSlotEndsAt() {
+        return slotEndsAt;
+    }
+
+    public String getFulfillmentLabel() {
+        return fulfillmentLabel;
     }
 
     public String getPaymentUrl() {

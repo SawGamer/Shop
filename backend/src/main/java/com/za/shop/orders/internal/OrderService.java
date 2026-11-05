@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.za.shop.cart.CartView;
+import com.za.shop.fulfillment.FulfillmentService;
 import com.za.shop.inventory.InventoryService;
 import com.za.shop.inventory.StockLevel;
 import com.za.shop.orders.OrderEvents;
@@ -35,19 +36,46 @@ class OrderService {
     private final InventoryService inventory;
     private final ApplicationEventPublisher events;
     private final Clock clock;
+    private final FulfillmentService fulfillment;
 
-    OrderService(OrderRepository orders, InventoryService inventory, ApplicationEventPublisher events, Clock clock) {
+    OrderService(OrderRepository orders, InventoryService inventory, ApplicationEventPublisher events, Clock clock,
+            FulfillmentService fulfillment) {
         this.orders = orders;
         this.inventory = inventory;
         this.events = events;
         this.clock = clock;
+        this.fulfillment = fulfillment;
     }
 
-    /** Creates the order from server-side prices and reserves its stock; all or nothing. */
-    Order place(AuthenticatedUser customer, ShippingAddress address, CartView cart) {
+    /**
+     * Creates the order from server-side prices and reserves its stock; all or nothing. In LOCAL mode the delivery
+     * or pickup slot is booked in the same transaction, and the slot's fee replaces the flat shipping fee.
+     */
+    Order place(AuthenticatedUser customer, ShippingAddress address, CartView cart,
+            OrderDtos.FulfillmentChoice choice) {
         Instant now = clock.instant();
+        long shippingCents = cart.shipping().cents();
+        FulfillmentService.Booking booking = null;
+        if (fulfillment.isLocalMode()) {
+            if (choice == null) {
+                throw ApiException.badRequest("VALIDATION_FAILED", "Choose delivery or pickup and a time slot")
+                        .with("errors", java.util.Map.of("fulfillment", "is required"));
+            }
+            booking = fulfillment.book(new FulfillmentService.BookRequest(choice.method(), choice.slotId(),
+                    choice.locationId(), address.postalCode(), cart.subtotal().cents()));
+            shippingCents = booking.feeCents();
+            if (booking.pickupAddress() != null) {
+                var store = booking.pickupAddress();
+                address = new ShippingAddress(address.fullName(), store.line1(), store.line2(), store.postalCode(),
+                        store.city(), store.country(), address.phone());
+            }
+        }
         Order order = new Order("ZA-" + orders.nextOrderNumber(), customer.id(), customer.email(),
-                cart.subtotal().currency(), address, cart.shipping().cents(), now, now.plus(PAYMENT_WINDOW));
+                cart.subtotal().currency(), address, shippingCents, now, now.plus(PAYMENT_WINDOW));
+        if (booking != null) {
+            order.setFulfillment(booking.method().name(), booking.slotKey(), booking.startsAt(), booking.endsAt(),
+                    booking.label());
+        }
         for (CartView.Item item : cart.items()) {
             order.addLine(item.variantId(), item.productId(), item.productSlug(), item.productName(), item.sku(),
                     item.size(), item.color(), item.imageUrl(), item.unitPrice().cents(), item.quantity());
@@ -90,6 +118,9 @@ class OrderService {
                 inventory.reserve(orderId, wanted);
                 order.markPaid(now);
                 inventory.commit(orderId);
+                if (order.getFulfillmentSlotKey() != null) {
+                    fulfillment.rebook(order.getFulfillmentSlotKey());
+                }
                 log.warn("Order {} was paid after it expired; stock re-reserved", order.getOrderNumber());
             }
             default -> {
@@ -111,6 +142,9 @@ class OrderService {
         }
         order.cancel(clock.instant());
         inventory.release(orderId);
+        if (order.getFulfillmentSlotKey() != null) {
+            fulfillment.release(order.getFulfillmentSlotKey());
+        }
         events.publishEvent(new OrderEvents.OrderCancelled(order.getId(), order.getOrderNumber(),
                 order.getCustomerEmail(), reason));
         log.info("Order {} cancelled: {}", order.getOrderNumber(), reason);

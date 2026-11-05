@@ -2,6 +2,7 @@ package com.za.shop.settings.internal;
 
 import java.time.Instant;
 
+import com.za.shop.settings.FulfillmentMode;
 import com.za.shop.settings.Theme;
 
 import jakarta.persistence.Entity;
@@ -33,6 +34,9 @@ public class ShopSettings {
 
     private String logoUrl;
 
+    @Enumerated(EnumType.STRING)
+    private FulfillmentMode fulfillmentMode = FulfillmentMode.SHIPPING;
+
     private Instant updatedAt;
 
     @Version
@@ -54,6 +58,15 @@ public class ShopSettings {
         this.theme = theme;
         this.accentColor = accentColor;
         this.updatedAt = now;
+    }
+
+    public void setFulfillmentMode(FulfillmentMode mode, Instant now) {
+        this.fulfillmentMode = mode;
+        this.updatedAt = now;
+    }
+
+    public FulfillmentMode getFulfillmentMode() {
+        return fulfillmentMode;
     }
 
     /** @return the storage key of the logo being replaced, or null */

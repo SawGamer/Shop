@@ -37,12 +37,12 @@ class CheckoutService {
         this.payments = payments;
     }
 
-    CheckoutResult checkout(AuthenticatedUser customer, ShippingAddress address) {
+    CheckoutResult checkout(AuthenticatedUser customer, ShippingAddress address, OrderDtos.FulfillmentChoice choice) {
         CartView cart = carts.view(new CartOwner.Customer(customer.id()));
         if (cart.isEmpty()) {
             throw ApiException.badRequest("EMPTY_CART", "Your cart is empty");
         }
-        Order order = orders.place(customer, address, cart);
+        Order order = orders.place(customer, address, cart, choice);
         PaymentService.PaymentSessionInfo session;
         try {
             session = payments.createCheckout(new PaymentRequest(order.getId(), customer.id(), order.getOrderNumber(),

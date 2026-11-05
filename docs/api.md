@@ -295,15 +295,19 @@ type Zone = { id: string; name: string; postcodePrefixes: string[]; feeCents: nu
 type Location = { id: string; name: string; address: Address; openingHours: string }   // Address as in the shared types
 type Slot = { id: string; startsAt: string; endsAt: string; remaining: number }          // remaining > 0
 type SlotDay = { date: string; slots: Slot[] }                                           // date = "2026-11-06", shop time zone
-type Fulfillment =
-  | { method: "DELIVERY"; slot: { startsAt: string; endsAt: string }; zoneName: string; feeCents: number }
-  | { method: "PICKUP"; slot: { startsAt: string; endsAt: string }; locationName: string }
+type Fulfillment = {
+  method: FulfillmentMethod; slot: { startsAt: string; endsAt: string };
+  zoneName: string | null; feeCents: number | null;      // DELIVERY
+  locationName: string | null                            // PICKUP
+}
 ```
 
-- `ShopSettings` gains `fulfillmentMode: "SHIPPING" | "LOCAL"`, `timeZone` (IANA) and, in `LOCAL` mode,
-  `minOrder: Money | null` is the lowest `minOrderCents` over all zones (for a hint before a postcode is known).
+- `ShopSettings` gains `fulfillmentMode: "SHIPPING" | "LOCAL"` and `timeZone` (IANA; the time zone of slots and
+  opening hours).
 - `Order` gains `fulfillment: Fulfillment | null` (null in `SHIPPING` mode).
-- `Cart` gains `minOrder: Money | null` and `belowMinimum: boolean` once `?postcode=` is passed (see below).
+- The cart is unchanged. To show "add €X more to order", the storefront compares `cart.subtotal` with the
+  `minOrderCents` of the zone it got from `GET /fulfillment/zone?postcode=`; the server enforces the minimum at
+  checkout.
 
 Public endpoints (`LOCAL` mode; `409 FULFILLMENT_DISABLED` in `SHIPPING` mode):
 
@@ -316,7 +320,10 @@ Public endpoints (`LOCAL` mode; `409 FULFILLMENT_DISABLED` in `SHIPPING` mode):
 
 Checkout in `LOCAL` mode: `POST /checkout` body is
 `{ shippingAddress, fulfillment: { method, slotId, locationId? } }` where `locationId` is required for `PICKUP`.
-For `DELIVERY` the zone is derived from `shippingAddress.postalCode`.
+For `DELIVERY` the zone is derived from `shippingAddress.postalCode`. For `PICKUP` the storefront sends the
+store's address (with the customer's name and phone) as `shippingAddress`; the server replaces the address with
+the store's own address, and the minimum order does not apply. `slotId` is an opaque id taken from the slots
+endpoint, and slots can only be booked while they are listed there.
 
 - The slot is booked atomically together with the stock reservation; if it filled up meanwhile:
   `409 SLOT_UNAVAILABLE`. A postcode outside every zone: `400 NOT_DELIVERABLE` (`errors.postalCode`).

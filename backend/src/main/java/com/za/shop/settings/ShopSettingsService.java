@@ -55,7 +55,8 @@ public class ShopSettingsService {
     public ShopSettingsView current() {
         return repository.findById(ShopSettings.SINGLETON_ID).map(this::view)
                 .orElseGet(() -> new ShopSettingsView(defaultName, null,
-                        Theme.fromId(defaultTheme).orElse(Theme.FOOTWEAR).id(), null, null, shop.currency(), null));
+                        Theme.fromId(defaultTheme).orElse(Theme.FOOTWEAR).id(), null, null, shop.currency(), null,
+                        FulfillmentMode.SHIPPING.name(), shop.timeZone()));
     }
 
     @Transactional
@@ -67,6 +68,18 @@ public class ShopSettingsService {
         settings.update(name.trim(), tagline == null || tagline.isBlank() ? null : tagline.trim(), theme,
                 accentColor == null || accentColor.isBlank() ? null : accentColor.toLowerCase(), clock.instant());
         return view(settings);
+    }
+
+    @Transactional
+    public ShopSettingsView setFulfillmentMode(FulfillmentMode mode) {
+        ShopSettings settings = load();
+        settings.setFulfillmentMode(mode, clock.instant());
+        return view(settings);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isLocalFulfillment() {
+        return current().fulfillmentMode().equals(FulfillmentMode.LOCAL.name());
     }
 
     @Transactional
@@ -106,6 +119,6 @@ public class ShopSettingsService {
 
     private ShopSettingsView view(ShopSettings s) {
         return new ShopSettingsView(s.getName(), s.getTagline(), s.getTheme().id(), s.getAccentColor(),
-                s.getLogoUrl(), shop.currency(), s.getUpdatedAt());
+                s.getLogoUrl(), shop.currency(), s.getUpdatedAt(), s.getFulfillmentMode().name(), shop.timeZone());
     }
 }
