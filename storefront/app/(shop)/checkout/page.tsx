@@ -1,16 +1,22 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Totals } from "@/components/cart-summary";
+import { CheckoutProvider, LocalCheckoutTotals } from "@/components/checkout-context";
 import { CheckoutForm } from "@/components/checkout-form";
+import { LocalCheckoutForm } from "@/components/local-checkout-form";
 import { Container, PageTitle, ProductImage, ServiceDown } from "@/components/ui";
 import { requireUser } from "@/lib/auth";
 import { getCartSafe } from "@/lib/data";
+import { getFulfillmentConfig, getLocations, getPostcodeCookie, getZone } from "@/lib/fulfillment-data";
 import { formatMoney } from "@/lib/money";
 
 export const metadata: Metadata = { title: "Checkout" };
 
-export default async function CheckoutPage() {
+type Props = { searchParams: Promise<{ method?: string }> };
+
+export default async function CheckoutPage({ searchParams }: Props) {
   const user = await requireUser("/checkout");
+  const { method: methodParam } = await searchParams;
   const cart = await getCartSafe();
   if (!cart) {
     return (
@@ -26,12 +32,30 @@ export default async function CheckoutPage() {
     cart.items.map((i) => [i.variantId, [i.productName, i.size && `size ${i.size}`].filter(Boolean).join(", ")]),
   );
 
-  return (
+  const { mode, timeZone } = await getFulfillmentConfig();
+  const local = mode === "LOCAL";
+  const postcode = local ? await getPostcodeCookie() : null;
+  const [zone, locations] = local
+    ? await Promise.all([postcode ? getZone(postcode) : Promise.resolve(null), getLocations()])
+    : [null, []];
+  const defaultName = `${user.firstName} ${user.lastName}`.trim();
+
+  const page = (
     <Container className="py-10">
       <PageTitle sub={`Signed in as ${user.email}`}>Checkout</PageTitle>
       <div className="grid gap-10 lg:grid-cols-[1fr_24rem]">
         <div className="max-w-xl">
-          <CheckoutForm defaultName={`${user.firstName} ${user.lastName}`.trim()} itemNames={itemNames} />
+          {local ? (
+            <LocalCheckoutForm
+              defaultName={defaultName}
+              itemNames={itemNames}
+              locations={locations}
+              timeZone={timeZone}
+              initialPostcode={postcode}
+            />
+          ) : (
+            <CheckoutForm defaultName={defaultName} itemNames={itemNames} />
+          )}
         </div>
         <aside aria-label="Order summary" className="h-fit rounded-tag bg-white p-5">
           <h2 className="headline text-xl">Your order</h2>
@@ -51,11 +75,21 @@ export default async function CheckoutPage() {
               </li>
             ))}
           </ul>
-          <div className="mt-5 border-t border-mist pt-4">
-            <Totals cart={cart} />
-          </div>
+          <div className="mt-5 border-t border-mist pt-4">{local ? <LocalCheckoutTotals /> : <Totals cart={cart} />}</div>
         </aside>
       </div>
     </Container>
+  );
+
+  if (!local) return page;
+  return (
+    <CheckoutProvider
+      initialMethod={methodParam === "pickup" && locations.length > 0 ? "PICKUP" : "DELIVERY"}
+      initialZone={zone}
+      subtotalCents={cart.subtotal.cents}
+      currency={cart.subtotal.currency}
+    >
+      {page}
+    </CheckoutProvider>
   );
 }

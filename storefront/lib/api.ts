@@ -11,6 +11,8 @@ export class ApiError extends Error {
   readonly detail: string;
   readonly errors: Record<string, string>;
   readonly items: StockProblem[];
+  /** Other problem properties, e.g. `minOrder` and `subtotal` of BELOW_MINIMUM_ORDER. */
+  readonly extra: Record<string, unknown>;
 
   constructor(init: {
     status: number;
@@ -19,6 +21,7 @@ export class ApiError extends Error {
     detail?: string;
     errors?: Record<string, string>;
     items?: StockProblem[];
+    extra?: Record<string, unknown>;
   }) {
     super(init.detail || init.title || init.code);
     this.name = "ApiError";
@@ -28,6 +31,7 @@ export class ApiError extends Error {
     this.detail = init.detail ?? "";
     this.errors = init.errors ?? {};
     this.items = init.items ?? [];
+    this.extra = init.extra ?? {};
   }
 }
 
@@ -73,6 +77,10 @@ const KNOWN_CODES = new Set<ErrorCode>([
   "INVALID_STATE_TRANSITION",
   "CONFLICT",
   "PAYMENT_PROVIDER_ERROR",
+  "SLOT_UNAVAILABLE",
+  "NOT_DELIVERABLE",
+  "BELOW_MINIMUM_ORDER",
+  "FULFILLMENT_DISABLED",
 ]);
 
 function fallbackCode(status: number): ErrorCode {
@@ -120,6 +128,7 @@ async function parseProblem(res: Response): Promise<ApiError> {
         ? (body.errors as Record<string, string>)
         : undefined,
     items: Array.isArray(body.items) ? (body.items as StockProblem[]) : undefined,
+    extra: body,
   });
 }
 

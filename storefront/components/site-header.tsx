@@ -6,6 +6,8 @@ import { logout } from "@/lib/actions/auth";
 import { getShop } from "@/lib/shop";
 import type { HeaderVariant } from "@/lib/themes/types";
 import { MegaMenu } from "./mega-menu";
+import { PostcodeControl } from "./postcode-control";
+import { getPostcodeCookie, getZone } from "@/lib/fulfillment-data";
 import { Container } from "./ui";
 import type { Category, User } from "@/lib/types";
 
@@ -149,6 +151,11 @@ export async function SiteHeader() {
   const { theme, settings } = shop;
   const s = STYLE[theme.layout.header];
   const count = cart?.itemCount ?? 0;
+  // Delivery area control, only in LOCAL fulfillment mode (slots and pickup instead of parcel shipping).
+  const local = settings.fulfillmentMode === "LOCAL";
+  const postcode = local ? await getPostcodeCookie() : null;
+  const zone = postcode ? await getZone(postcode).catch(() => null) : null;
+  const dark = theme.layout.header === "tech" || theme.layout.header === "market";
   const { searchLabel, searchPlaceholder } = theme.labels;
 
   const desktopSearch = (
@@ -197,12 +204,18 @@ export async function SiteHeader() {
         </form>
       </Container>
 
+      {local && (
+        <Container className={clsx("pb-2", s.centered && "md:text-center")}>
+          <PostcodeControl postcode={postcode} zone={zone} currency={settings.currency} tone={dark ? "dark" : "light"} />
+        </Container>
+      )}
+
       {nav.length > 0 && theme.layout.megaMenu && (
         <div className={s.nav}>
           <Container>
             <MegaMenu
               categories={nav.slice(0, 8)}
-              tone={theme.layout.header === "tech" || theme.layout.header === "market" ? "dark" : "light"}
+              tone={dark ? "dark" : "light"}
               extras={[
                 { label: "Deals of the day", href: "/search?deal=true&sort=deal_ending", tone: "sale" },
                 { label: "New in", href: "/search?sort=newest" },

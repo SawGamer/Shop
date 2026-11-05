@@ -3,11 +3,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AdminTitle, Panel } from "@/components/admin/bits";
 import { ActionForm, SubmitButton } from "@/components/forms";
+import { FulfillmentBlock, addressHeading } from "@/components/order-fulfillment";
 import { OrderAddress, OrderLines, OrderTimeline, OrderTotals } from "@/components/order-lines";
 import { OrderStatusBadge } from "@/components/ui";
 import { setOrderStatus } from "@/lib/actions/admin";
 import { getAdminOrder } from "@/lib/data";
 import { formatDateTime } from "@/lib/format";
+import { getFulfillmentConfig } from "@/lib/fulfillment-data";
 import type { OrderStatus } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Order" };
@@ -25,6 +27,7 @@ export default async function AdminOrderPage({ params }: Props) {
   const { id } = await params;
   const order = await getAdminOrder(id);
   if (!order) notFound();
+  const { timeZone } = await getFulfillmentConfig();
   const actions = NEXT[order.status] ?? [];
 
   return (
@@ -68,7 +71,12 @@ export default async function AdminOrderPage({ params }: Props) {
           </Panel>
         </div>
         <div className="space-y-4">
-          <Panel title="Ship to">
+          {order.fulfillment && (
+            <Panel title={order.fulfillment.method === "PICKUP" ? "Pickup" : "Delivery"}>
+              <FulfillmentBlock order={order} timeZone={timeZone} heading={false} />
+            </Panel>
+          )}
+          <Panel title={order.fulfillment ? addressHeading(order) : "Ship to"}>
             <OrderAddress order={order} />
           </Panel>
           <Panel title="Totals">

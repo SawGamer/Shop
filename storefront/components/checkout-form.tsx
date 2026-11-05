@@ -5,8 +5,33 @@ import Link from "next/link";
 import { Field, SelectField, SubmitButton } from "./forms";
 import { Notice } from "./ui";
 import { placeOrder } from "@/lib/actions/checkout";
-import { IDLE } from "@/lib/action-state";
+import { IDLE, type ActionState } from "@/lib/action-state";
 import { COUNTRIES } from "@/lib/format";
+
+/** The error banner above the checkout form: sold-out items, or the message of any other failure. */
+export function CheckoutNotice({ state, itemNames }: { state: ActionState; itemNames: Record<string, string> }) {
+  if (state.status !== "error") return null;
+  if (state.stock && state.stock.length > 0) {
+    return (
+      <Notice tone="error" title="Some items sold out while you were shopping">
+        <ul className="mt-1 list-disc pl-5">
+          {state.stock.map((s) => (
+            <li key={s.variantId}>
+              {itemNames[s.variantId] ?? "An item"}: you asked for {s.requested}, {s.available} left.
+            </li>
+          ))}
+        </ul>
+        <p className="mt-2">
+          <Link href="/cart" className="font-semibold text-cobalt hover:underline">
+            Update your cart
+          </Link>{" "}
+          and try again.
+        </p>
+      </Notice>
+    );
+  }
+  return <Notice tone="error" title={state.message} />;
+}
 
 export function CheckoutForm({
   defaultName,
@@ -22,25 +47,7 @@ export function CheckoutForm({
 
   return (
     <form action={formAction} className="space-y-5" noValidate>
-      {state.status === "error" && state.stock && state.stock.length > 0 ? (
-        <Notice tone="error" title="Some items sold out while you were shopping">
-          <ul className="mt-1 list-disc pl-5">
-            {state.stock.map((s) => (
-              <li key={s.variantId}>
-                {itemNames[s.variantId] ?? "An item"}: you asked for {s.requested}, {s.available} left.
-              </li>
-            ))}
-          </ul>
-          <p className="mt-2">
-            <Link href="/cart" className="font-semibold text-cobalt hover:underline">
-              Update your cart
-            </Link>{" "}
-            and try again.
-          </p>
-        </Notice>
-      ) : state.status === "error" ? (
-        <Notice tone="error" title={state.message} />
-      ) : null}
+      <CheckoutNotice state={state} itemNames={itemNames} />
 
       <fieldset className="space-y-4">
         <legend className="headline mb-1 text-xl">Shipping address</legend>

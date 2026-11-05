@@ -190,6 +190,71 @@ export type OrderSummary = {
   customerEmail: string;
 };
 
+export type FulfillmentMethod = "DELIVERY" | "PICKUP";
+export type FulfillmentMode = "SHIPPING" | "LOCAL";
+
+export type Zone = {
+  id: string;
+  name: string;
+  postcodePrefixes: string[];
+  feeCents: number;
+  freeFromCents: number | null;
+  minOrderCents: number;
+};
+
+export type PickupLocation = {
+  id: string;
+  name: string;
+  address: Address;
+  openingHours: string;
+};
+
+export type Slot = { id: string; startsAt: string; endsAt: string; remaining: number };
+/** `date` is "2026-11-06" in the shop's time zone. */
+export type SlotDay = { date: string; slots: Slot[] };
+
+export type OrderFulfillment = {
+  method: FulfillmentMethod;
+  slot: { startsAt: string; endsAt: string };
+  zoneName: string | null;
+  feeCents: number | null;
+  locationName: string | null;
+};
+
+export type OpeningRange = { dayOfWeek: 1 | 2 | 3 | 4 | 5 | 6 | 7; from: string; to: string };
+
+export type Schedule = {
+  slotMinutes: number;
+  capacityPerSlot: number;
+  leadTimeMinutes: number;
+  horizonDays: number;
+  openingHours: OpeningRange[];
+};
+
+export type AdminFulfillment = {
+  mode: FulfillmentMode;
+  timeZone: string;
+  zones: Zone[];
+  locations: PickupLocation[];
+  schedule: Schedule;
+};
+
+export type ZoneUpsert = {
+  name: string;
+  postcodePrefixes: string[];
+  feeCents: number;
+  freeFromCents: number | null;
+  minOrderCents: number;
+};
+
+export type LocationUpsert = { name: string; address: Address; openingHours: string };
+
+export type ReorderResult = {
+  cart: Cart;
+  added: number;
+  skipped: { productName: string; reason: "UNAVAILABLE" | "OUT_OF_STOCK" }[];
+};
+
 export type Order = {
   id: string;
   orderNumber: string;
@@ -206,6 +271,8 @@ export type Order = {
   deliveredAt: string | null;
   cancelledAt: string | null;
   paymentUrl: string | null;
+  /** Present in LOCAL fulfillment mode (delivery slot or pickup); null/absent for parcel shipping. */
+  fulfillment?: OrderFulfillment | null;
 };
 
 export type CheckoutResponse = {
@@ -296,6 +363,10 @@ export type ErrorCode =
   | "INVALID_STATE_TRANSITION"
   | "CONFLICT"
   | "PAYMENT_PROVIDER_ERROR"
+  | "SLOT_UNAVAILABLE"
+  | "NOT_DELIVERABLE"
+  | "BELOW_MINIMUM_ORDER"
+  | "FULFILLMENT_DISABLED"
   | "API_UNAVAILABLE"
   | "UNKNOWN";
 
@@ -313,6 +384,10 @@ export type ShopSettings = {
   logoUrl: string | null;
   currency: string;
   updatedAt: string;
+  /** Missing on older APIs; treated as parcel shipping. */
+  fulfillmentMode?: FulfillmentMode;
+  /** IANA time zone of delivery slots and opening hours. */
+  timeZone?: string;
 };
 
 export type ShopSettingsUpdate = {

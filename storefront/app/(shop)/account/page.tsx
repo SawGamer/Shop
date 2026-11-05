@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ResendVerificationButton } from "@/components/auth-forms";
 import { Pagination } from "@/components/pagination";
+import { ReorderButton } from "@/components/reorder-button";
 import { Container, EmptyState, OrderStatusBadge, PageTitle, ServiceDown } from "@/components/ui";
 import { logout } from "@/lib/actions/auth";
 import { isAdmin, requireUser } from "@/lib/auth";
 import { getMyOrders } from "@/lib/data";
+import { getFulfillmentConfig } from "@/lib/fulfillment-data";
 import { formatDate, pluralize } from "@/lib/format";
 import { formatMoney } from "@/lib/money";
 import { getShop } from "@/lib/shop";
@@ -18,6 +20,7 @@ type Props = { searchParams: Promise<{ page?: string }> };
 export default async function AccountPage({ searchParams }: Props) {
   const user = await requireUser("/account");
   const { theme } = await getShop();
+  const { mode } = await getFulfillmentConfig();
   const pageNum = Math.max(1, Number.parseInt((await searchParams).page ?? "1", 10) || 1);
 
   let orders: Page<OrderSummary> | null = null;
@@ -88,10 +91,10 @@ export default async function AccountPage({ searchParams }: Props) {
             <>
               <ul className="divide-y divide-mist border-y border-mist">
                 {orders.items.map((o) => (
-                  <li key={o.id}>
+                  <li key={o.id} className="flex flex-wrap items-center gap-x-4 gap-y-1 hover:bg-white">
                     <Link
                       href={`/account/orders/${o.id}`}
-                      className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1 px-1 py-4 hover:bg-white sm:grid-cols-[10rem_1fr_auto_auto]"
+                      className="grid min-w-0 flex-1 grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1 px-1 py-4 sm:grid-cols-[10rem_1fr_auto_auto]"
                     >
                       <span className="tabular font-semibold">{o.orderNumber}</span>
                       <span className="text-sm text-ink-soft">
@@ -100,6 +103,7 @@ export default async function AccountPage({ searchParams }: Props) {
                       <OrderStatusBadge status={o.status} />
                       <span className="tabular text-right font-semibold">{formatMoney(o.total)}</span>
                     </Link>
+                    {mode === "LOCAL" && <ReorderButton orderId={o.id} className="px-1 pb-3 sm:pb-0" />}
                   </li>
                 ))}
               </ul>

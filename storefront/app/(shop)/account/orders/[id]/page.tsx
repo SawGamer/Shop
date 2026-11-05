@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { FulfillmentBlock, addressHeading } from "@/components/order-fulfillment";
 import { OrderAddress, OrderLines, OrderTimeline, OrderTotals } from "@/components/order-lines";
+import { ReorderButton } from "@/components/reorder-button";
 import { Container, OrderStatusBadge } from "@/components/ui";
 import { requireUser } from "@/lib/auth";
 import { getOrder } from "@/lib/data";
 import { formatDateTime } from "@/lib/format";
+import { getFulfillmentConfig } from "@/lib/fulfillment-data";
 
 export const metadata: Metadata = { title: "Order" };
 
@@ -16,6 +19,7 @@ export default async function OrderPage({ params }: Props) {
   await requireUser(`/account/orders/${id}`);
   const order = await getOrder(id);
   if (!order) notFound();
+  const { mode, timeZone } = await getFulfillmentConfig();
 
   return (
     <Container className="py-10">
@@ -25,6 +29,7 @@ export default async function OrderPage({ params }: Props) {
       <div className="mt-3 mb-8 flex flex-wrap items-center gap-3">
         <h1 className="headline tabular text-3xl sm:text-4xl">Order {order.orderNumber}</h1>
         <OrderStatusBadge status={order.status} />
+        {mode === "LOCAL" && <ReorderButton orderId={order.id} className="sm:ml-auto" />}
       </div>
 
       {order.status === "PENDING_PAYMENT" && order.paymentUrl && (
@@ -42,8 +47,9 @@ export default async function OrderPage({ params }: Props) {
           <OrderLines order={order} />
         </div>
         <aside className="h-fit space-y-6 rounded-tag bg-white p-5">
+          <FulfillmentBlock order={order} timeZone={timeZone} />
           <div>
-            <h2 className="mb-2 text-sm font-semibold text-ink-soft">Ships to</h2>
+            <h2 className="mb-2 text-sm font-semibold text-ink-soft">{addressHeading(order)}</h2>
             <OrderAddress order={order} />
           </div>
           <div>

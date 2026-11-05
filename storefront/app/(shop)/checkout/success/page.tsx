@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { FulfillmentBlock } from "@/components/order-fulfillment";
 import { OrderStatusPoller, RefreshSoon } from "@/components/order-status-poller";
 import { Container, Notice } from "@/components/ui";
 import { requireUser } from "@/lib/auth";
 import { getOrder } from "@/lib/data";
+import { getFulfillmentConfig } from "@/lib/fulfillment-data";
 import { formatMoney } from "@/lib/money";
 import { describeSize } from "@/lib/colors";
 
@@ -18,6 +20,7 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
   if (!orderId) notFound();
   const order = await getOrder(orderId);
   if (!order) notFound();
+  const { timeZone } = await getFulfillmentConfig();
 
   if (order.status === "PENDING_PAYMENT") {
     return (
@@ -54,6 +57,11 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
         Order <strong className="text-ink">{order.orderNumber}</strong> is confirmed. Shipping updates go to{" "}
         {order.customerEmail}.
       </p>
+      {order.fulfillment && (
+        <div className="mt-6 rounded-tag bg-white p-5">
+          <FulfillmentBlock order={order} timeZone={timeZone} />
+        </div>
+      )}
       <div className="mt-8 rounded-tag bg-white p-5">
         <ul className="space-y-2 text-sm">
           {order.lines.map((l) => (
