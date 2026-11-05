@@ -16,7 +16,7 @@ import com.za.shop.shared.Slugs;
 class DemoCatalogsTests {
 
     @ParameterizedTest
-    @ValueSource(strings = { "footwear", "electronics", "grocery", "home", "beauty" })
+    @ValueSource(strings = { "footwear", "electronics", "grocery", "home", "beauty", "sports", "books", "gourmet" })
     void catalogIsConsistent(String id) {
         DemoCatalogs.Catalog catalog = DemoCatalogs.get(id);
         assertThat(Theme.fromId(id)).as("every demo catalog has a matching design").isPresent();

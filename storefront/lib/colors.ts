@@ -71,6 +71,29 @@ const SWATCHES: Record<string, string> = {
   peony: "#e58aa2",
   apricot: "#f0a477",
   rose: "#d98a9c",
+  // sports & outdoor
+  forest: "#2d5a3d",
+  ember: "#d4531c",
+  moss: "#6f8548",
+  neon: "#c6f432",
+  lime: "#b5e12b",
+  "matt black": "#25282b",
+  steel: "#7d8791",
+  // gourmet: chocolate, pizza and flavour names
+  "dark 70%": "#3b2218",
+  "milk 45%": "#8a5a3c",
+  "sea salt": "#d9d2c4",
+  margherita: "#d9503a",
+  salame: "#a8321f",
+  funghi: "#8a7258",
+  raspberry: "#b3214f",
+  pistachio: "#a9c27a",
+  chilli: "#c4301c",
+  mixed: "#d9a066",
+  assorted: "#c58a5a",
+  classic: "#a9703f",
+  "dark only": "#2c1810",
+  plain: "#e8d9b8",
 };
 
 export function swatchFor(color: string | null | undefined): string | null {

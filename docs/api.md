@@ -416,7 +416,7 @@ One row of settings describes the shop: its name and the storefront design. The 
 validates them; how a design looks is entirely up to the storefront.
 
 ```ts
-type ThemeId = "footwear" | "electronics" | "grocery" | "home" | "beauty"
+type ThemeId = "footwear" | "electronics" | "grocery" | "home" | "beauty" | "sports" | "books" | "gourmet"
 type ShopSettings = {
   name: string;               // e.g. "Z&A"
   tagline: string | null;     // short line for the hero/footer

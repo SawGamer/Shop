@@ -83,8 +83,13 @@ class DemoCatalogSeeder implements ApplicationRunner {
             for (String color : orNone(seed.colors())) {
                 for (String size : orNone(seed.sizes())) {
                     int stock = random.nextInt(10) < 2 ? 0 : 1 + random.nextInt(catalog.stockRange());
+                    long price = size == null ? seed.priceCents() : DemoExtras.SIZE_PRICES
+                            .getOrDefault(seed.name(), Map.of()).getOrDefault(size, seed.priceCents());
+                    var wasBySize = size == null ? Map.<String, Long>of()
+                            : DemoExtras.SIZE_COMPARE_AT.getOrDefault(seed.name(), Map.of());
+                    Long was = wasBySize.isEmpty() ? seed.compareAtCents() : wasBySize.get(size);
                     admin.addVariant(product.id(), new VariantUpsert(String.format("%s-%02d", skuBase, ++n), size, color,
-                            seed.priceCents(), seed.compareAtCents(), stock));
+                            price, was, stock));
                 }
             }
             if (catalog.id().equals("electronics")) {

@@ -63,7 +63,8 @@ public class ShopSettingsService {
     public ShopSettingsView update(String name, String tagline, String themeId, String accentColor) {
         Theme theme = Theme.fromId(themeId).orElseThrow(() -> ApiException
                 .badRequest("VALIDATION_FAILED", "Unknown design")
-                .with("errors", Map.of("theme", "must be one of footwear, electronics, grocery, home, beauty")));
+                .with("errors", Map.of("theme", "must be one of " + String.join(", ",
+                        java.util.Arrays.stream(Theme.values()).map(Theme::id).toList()))));
         ShopSettings settings = load();
         settings.update(name.trim(), tagline == null || tagline.isBlank() ? null : tagline.trim(), theme,
                 accentColor == null || accentColor.isBlank() ? null : accentColor.toLowerCase(), clock.instant());

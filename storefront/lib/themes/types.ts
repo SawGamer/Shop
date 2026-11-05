@@ -1,11 +1,11 @@
 // A storefront design. Colours, fonts and radii live in app/globals.css under [data-theme="<id>"];
 // this file describes everything else a design changes: wording, option labels and layout choices.
 
-export const THEME_IDS = ["footwear", "electronics", "grocery", "home", "beauty"] as const;
+export const THEME_IDS = ["footwear", "electronics", "grocery", "home", "beauty", "sports", "books", "gourmet"] as const;
 export type ThemeId = (typeof THEME_IDS)[number];
 
-export type HeaderVariant = "classic" | "tech" | "market" | "editorial" | "boutique";
-export type CardVariant = "box" | "tech" | "market" | "portrait" | "boutique";
+export type HeaderVariant = "classic" | "tech" | "market" | "editorial" | "boutique" | "sport" | "bookshop";
+export type CardVariant = "box" | "tech" | "market" | "portrait" | "boutique" | "sport" | "cover" | "treat";
 
 export type Theme = {
   id: ThemeId;

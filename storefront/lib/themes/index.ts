@@ -1,14 +1,26 @@
 import { beauty } from "./beauty";
+import { books } from "./books";
 import { electronics } from "./electronics";
 import { footwear } from "./footwear";
+import { gourmet } from "./gourmet";
 import { grocery } from "./grocery";
 import { home } from "./home";
+import { sports } from "./sports";
 import { THEME_IDS, type Theme, type ThemeId } from "./types";
 
 export { THEME_IDS };
 export type { Theme, ThemeId };
 
-export const THEMES: Record<ThemeId, Theme> = { footwear, electronics, grocery, home, beauty };
+export const THEMES: Record<ThemeId, Theme> = {
+  footwear,
+  electronics,
+  grocery,
+  home,
+  beauty,
+  sports,
+  books,
+  gourmet,
+};
 
 export const DEFAULT_THEME: ThemeId = "footwear";
 

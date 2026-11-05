@@ -18,6 +18,12 @@ Variants have two generic option fields, `size` and `color`. Each design labels 
 | `grocery` | Pack size | Variety |
 | `home` | Size | Finish |
 | `beauty` | Size | Shade |
+| `sports` | Size | Colour |
+| `books` | Format | Language |
+| `gourmet` | Portion | Flavour |
+
+Products can have a different price per `size` value (e.g. book formats, box sizes); this is noted in the tables
+as "price by size".
 
 Images live in `backend/src/main/resources/seed/<catalog>/NN.jpg` (NN = the product number below). They are
 original illustrations made for this project, except `footwear`, which reuses the photos of the original shop.
@@ -101,3 +107,66 @@ Categories: Skincare › Cleansers, Serums, Moisturisers; Makeup › Lips, Face;
 | 10 | Santal eau de toilette | Aurel | Fragrance | 50 ml, 100 ml | – | 65 | |
 | 11 | Botanical body oil | Botanica | Body | 100 ml | – | 24 | |
 | 12 | Shea hand cream | Botanica | Body | 75 ml | – | 12 | |
+
+## sports
+
+Brands: Summit & Co, Trailhead, Velocity, Alpine Gear.
+Categories: Camping › Tents, Sleeping bags, Stoves; Hiking › Backpacks, Boots, Trekking poles; Running; Cycling; Fitness; Accessories.
+
+| # | Product | Brand | Category | Size | Colours | Price € | Was € |
+|---|---|---|---|---|---|---|---|
+| 01 | Ridge 45 L trekking backpack | Trailhead | Backpacks | S/M, M/L | Forest, Ember | 149 | 179 |
+| 02 | Dome tent | Summit & Co | Tents | 2 person, 3 person | Orange, Olive | 219 | |
+| 03 | Cloud −5° sleeping bag | Summit & Co | Sleeping bags | Regular, Long | Navy, Moss | 129 | |
+| 04 | Granite hiking boots | Trailhead | Boots | 40–46 | Brown, Grey | 169 | |
+| 05 | Carbon trekking poles | Alpine Gear | Trekking poles | 110 cm, 125 cm | Black, Red | 79 | 99 |
+| 06 | Beacon 400 headlamp | Alpine Gear | Accessories | – | Black, Orange | 39 | |
+| 07 | Flow insulated bottle | Summit & Co | Accessories | 0.5 l, 1 l | Steel, Lime, Navy | 29 | |
+| 08 | Gust wind running jacket | Velocity | Running | S, M, L, XL | Neon, Black | 99 | 129 |
+| 09 | Tempo running shorts | Velocity | Running | S, M, L, XL | Black, Teal | 45 | |
+| 10 | Apex cycling helmet | Velocity | Cycling | S, M, L | White, Matt Black, Red | 89 | |
+| 11 | Core yoga mat | Velocity | Fitness | 4 mm, 6 mm | Purple, Teal | 35 | |
+| 12 | Pocket camping stove | Summit & Co | Stoves | – | Silver | 49 | |
+
+## books
+
+Publishers (shown as brands): Northlight Press, Lantern Books, Quill & Page, Meadow House.
+Categories: Fiction › Novels, Thrillers, Science fiction; Non-fiction › History, Self-help; Cookbooks; Children.
+The books are fictional; the images are original cover illustrations with the fictional titles and authors below.
+
+| # | Title (author) | Publisher | Category | Format · price by size | Language | Was € |
+|---|---|---|---|---|---|---|
+| 01 | The Salt Road (Mara Lindqvist) | Northlight Press | Novels | Paperback 14.99, Hardcover 22.99, E-book 9.99 | English, German | |
+| 02 | Midnight at Harbour Nine (Jonas Pike) | Lantern Books | Thrillers | Paperback 13.99, E-book 8.99 | English | 15.99 (Paperback) |
+| 03 | Orbit of Quiet Stars (Idris Vale) | Quill & Page | Science fiction | Paperback 15.99, Hardcover 24.99, E-book 10.99 | English | |
+| 04 | Letters from the Vineyard (Elena Rossi) | Meadow House | Novels | Paperback 13.99, Hardcover 21.99 | English, German | |
+| 05 | The Glass Archipelago (Tomas Reyes) | Northlight Press | Science fiction | Paperback 14.99, E-book 9.99 | English | |
+| 06 | A Short History of Bridges (Hannah Brook) | Quill & Page | History | Hardcover 29.99, Paperback 18.99 | English | |
+| 07 | The Roman Table (Luca Ferrante) | Meadow House | History | Hardcover 32.00, Paperback 19.99 | English | |
+| 08 | How Small Habits Win (Dr. Nora Keane) | Lantern Books | Self-help | Paperback 16.99, E-book 11.99 | English, German | |
+| 09 | The Slow Kitchen (Amelie Hart) | Meadow House | Cookbooks | Hardcover 34.99 | English | |
+| 10 | One-Pan Weeknights (Sam Okafor) | Lantern Books | Cookbooks | Paperback 24.99, E-book 14.99 | English | |
+| 11 | Pip and the Moon Door (Clara Finch) | Meadow House | Children | Hardcover 15.99, Paperback 9.99 | English, German | |
+| 12 | The Secret of Fox Hollow (Ben Aldous) | Quill & Page | Children | Paperback 8.99, Hardcover 14.99 | English | |
+
+## gourmet
+
+For restaurants, patisseries and chocolate makers. This demo runs in **local fulfillment** mode (delivery slots and
+pickup in two shops), see docs/api.md.
+Brands: Maison Cacao, Sweet Orchard, Casa Fornaio, Little Kitchen.
+Categories: Chocolate › Pralines, Bars & spreads; Cakes & pastries › Cakes, Pastries; Take-away › Pizza, Mains; Desserts.
+
+| # | Product | Brand | Category | Portion · price by size | Flavours | Was € |
+|---|---|---|---|---|---|---|
+| 01 | Signature praline box | Maison Cacao | Pralines | Box of 9 19.00, Box of 16 32.00, Box of 25 46.00 | Assorted, Dark only | |
+| 02 | Single-origin chocolate bar | Maison Cacao | Bars & spreads | 100 g 4.49 | Dark 70%, Milk 45%, Sea salt | |
+| 03 | Hazelnut chocolate spread | Maison Cacao | Bars & spreads | 250 g 6.99, 400 g 9.99 | – | |
+| 04 | Hot chocolate mix | Maison Cacao | Bars & spreads | 250 g 8.99 | Classic, Chilli | |
+| 05 | Triple chocolate cake | Sweet Orchard | Cakes | Slice 4.50, Whole cake 34.00 | – | |
+| 06 | Macaron box | Sweet Orchard | Pastries | Box of 6 12.00, Box of 12 22.00 | Mixed, Pistachio | |
+| 07 | New York cheesecake | Sweet Orchard | Cakes | Slice 4.80, Whole cake 36.00 | Plain, Raspberry | |
+| 08 | Cinnamon rolls | Sweet Orchard | Pastries | 4 pack 10.00, 8 pack 18.00 | – | 20.00 (8 pack) |
+| 09 | Wood-fired pizza | Casa Fornaio | Pizza | Single 11.90, Family 17.90 | Margherita, Salame, Funghi | |
+| 10 | Lasagne al forno | Casa Fornaio | Mains | Single 11.90, Family 24.90 | – | |
+| 11 | Tiramisu cups | Little Kitchen | Desserts | 2 pack 7.90, 4 pack 14.90 | – | |
+| 12 | Seasonal berry tart | Little Kitchen | Desserts | Slice 4.50, Whole tart 32.00 | – | |

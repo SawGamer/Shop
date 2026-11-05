@@ -13,7 +13,10 @@ public enum Theme {
     ELECTRONICS,
     GROCERY,
     HOME,
-    BEAUTY;
+    BEAUTY,
+    SPORTS,
+    BOOKS,
+    GOURMET;
 
     public String id() {
         return name().toLowerCase(Locale.ROOT);

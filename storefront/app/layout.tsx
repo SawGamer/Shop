@@ -8,6 +8,15 @@ import "@fontsource-variable/inter";
 import "@fontsource-variable/jost";
 import "@fontsource/cormorant-garamond/500.css";
 import "@fontsource/cormorant-garamond/600.css";
+import "@fontsource/barlow-condensed/600.css";
+import "@fontsource/barlow-condensed/700.css";
+import "@fontsource/barlow-condensed/800.css";
+import "@fontsource/barlow/400.css";
+import "@fontsource/barlow/500.css";
+import "@fontsource/barlow/600.css";
+import "@fontsource-variable/source-serif-4";
+import "@fontsource/dm-serif-display/400.css";
+import "@fontsource-variable/dm-sans";
 import "./globals.css";
 import { getShop } from "@/lib/shop";
 
