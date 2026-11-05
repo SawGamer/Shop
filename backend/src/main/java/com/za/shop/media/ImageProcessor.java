@@ -52,6 +52,32 @@ public class ImageProcessor {
         }
     }
 
+    /** Logos keep their transparency: PNG, at most {@value #MAX_LOGO_DIMENSION}px. */
+    public ProcessedImage toLogoPng(byte[] upload) {
+        BufferedImage source = decode(upload);
+        if ((long) source.getWidth() * source.getHeight() > MAX_PIXELS) {
+            throw ApiException.badRequest("VALIDATION_FAILED", "Image dimensions are too large");
+        }
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            var builder = Thumbnails.of(source).outputFormat("png");
+            if (source.getWidth() > MAX_LOGO_DIMENSION || source.getHeight() > MAX_LOGO_DIMENSION) {
+                builder.size(MAX_LOGO_DIMENSION, MAX_LOGO_DIMENSION);
+            }
+            else {
+                builder.scale(1.0);
+            }
+            builder.toOutputStream(out);
+            byte[] bytes = out.toByteArray();
+            BufferedImage result = ImageIO.read(new ByteArrayInputStream(bytes));
+            return new ProcessedImage(bytes, "image/png", "png", result.getWidth(), result.getHeight());
+        }
+        catch (IOException e) {
+            throw new IllegalStateException("Could not encode logo", e);
+        }
+    }
+
+    static final int MAX_LOGO_DIMENSION = 512;
+
     private static BufferedImage decode(byte[] upload) {
         try {
             BufferedImage image = upload == null || upload.length == 0 ? null

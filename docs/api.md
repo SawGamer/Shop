@@ -236,6 +236,34 @@ With the fake provider (default in development, no Stripe keys needed) `paymentU
 page there with **Pay** and **Cancel** buttons that call the two endpoints above and then navigate to
 the success/cancelled page.
 
+## Shop settings and design
+
+One row of settings describes the shop: its name and the storefront design. The backend only stores and
+validates them; how a design looks is entirely up to the storefront.
+
+```ts
+type ThemeId = "footwear" | "electronics" | "grocery" | "home" | "beauty"
+type ShopSettings = {
+  name: string;               // e.g. "Z&A"
+  tagline: string | null;     // short line for the hero/footer
+  theme: ThemeId;
+  accentColor: string | null; // "#RRGGBB" overriding the design's accent colour, or null
+  logoUrl: string | null;     // transparent PNG, ≤ 512 px
+  currency: string;           // ISO-4217, e.g. "EUR"
+  updatedAt: string
+}
+```
+
+| Method & path | Auth | Body | Response |
+|---|---|---|---|
+| `GET /shop` | – (cacheable 30 s) | – | `200 ShopSettings` |
+| `PUT /admin/shop` | admin | `{ name (1–80), tagline (≤ 160, nullable), theme, accentColor (nullable, ^#[0-9a-fA-F]{6}$) }` | `200 ShopSettings` |
+| `POST /admin/shop/logo` | admin | multipart `file` (PNG/JPEG/GIF ≤ 2 MB) | `200 ShopSettings` |
+| `DELETE /admin/shop/logo` | admin | – | `200 ShopSettings` |
+
+The initial theme matches the seeded demo catalog (see docs/demo-catalogs.md, which also lists how each
+design labels the variant `size` and `color` fields).
+
 ## Admin — `/api/v1/admin` (role `ADMIN`)
 
 ```ts

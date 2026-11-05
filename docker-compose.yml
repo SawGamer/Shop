@@ -88,6 +88,8 @@ services:
       SHOP_DEMO_CUSTOMER_EMAIL: ${SHOP_DEMO_CUSTOMER_EMAIL:-customer@za-shop.local}
       SHOP_DEMO_CUSTOMER_PASSWORD: ${SHOP_DEMO_CUSTOMER_PASSWORD:-customer12345}
       SEED_DEMO_DATA: ${SEED_DEMO_DATA:-true}
+      SHOP_DEMO_CATALOG: ${SHOP_DEMO_CATALOG:-footwear}
+      SHOP_NAME: ${SHOP_NAME:-Z&A}
       LOGGING_STRUCTURED_FORMAT_CONSOLE: ecs
     ports: ["8080:8080"]
     depends_on:

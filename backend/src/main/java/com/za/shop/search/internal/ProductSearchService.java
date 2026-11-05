@@ -18,6 +18,7 @@ import org.springframework.web.client.RestClientException;
 import com.za.shop.catalog.CatalogLookup;
 import com.za.shop.shared.ApiException;
 import com.za.shop.shared.Money;
+import com.za.shop.shared.OptionOrder;
 import com.za.shop.shared.Paging;
 import com.za.shop.shared.ShopProperties;
 
@@ -170,10 +171,8 @@ class ProductSearchService {
     private static final Comparator<FacetValue> BY_COUNT = Comparator.comparingInt(FacetValue::count).reversed()
             .thenComparing(FacetValue::label, String.CASE_INSENSITIVE_ORDER);
 
-    private static final Comparator<FacetValue> BY_SIZE = Comparator
-            .comparing((FacetValue f) -> number(f.value()).isEmpty())
-            .thenComparing(f -> number(f.value()).orElse(0.0))
-            .thenComparing(FacetValue::value);
+    private static final Comparator<FacetValue> BY_SIZE = Comparator.comparing(FacetValue::value,
+            OptionOrder.COMPARATOR);
 
     private static List<FacetValue> facet(Map<String, Integer> counts, Map<String, String> labels,
             Comparator<FacetValue> order) {
@@ -197,14 +196,6 @@ class ProductSearchService {
         return "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
     }
 
-    private static Optional<Double> number(String value) {
-        try {
-            return Optional.of(Double.parseDouble(value.replace(',', '.').toLowerCase(Locale.ROOT)));
-        }
-        catch (NumberFormatException e) {
-            return Optional.empty();
-        }
-    }
 
     /** Facet labels change rarely; refresh them at most once a minute instead of on every search. */
     private static final class LabelCache {

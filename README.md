@@ -1,6 +1,8 @@
 # Z&A Shop
 
-A headless e-commerce platform for a shoe shop: a **Spring Boot 4 API** (Java 21) and a **Next.js 16 storefront with an admin dashboard**. It's built as a modular monolith that can scale out horizontally, the same path Shopify took before splitting anything into separate services.
+A headless e-commerce platform: a **Spring Boot 4 API** (Java 21) and a **Next.js 16 storefront with an admin dashboard**. It's built as a modular monolith that can scale out horizontally, the same path Shopify took before splitting anything into separate services.
+
+The storefront comes with **five designs for different kinds of shops**: footwear, electronics, grocery, home & furniture, and beauty. Admins switch between them live, with no redeploy. Each design has a matching demo catalog.
 
 ![Storefront home page](docs/images/storefront-home.jpg)
 
@@ -25,6 +27,32 @@ A headless e-commerce platform for a shoe shop: a **Spring Boot 4 API** (Java 21
 - Orders: search and filter them, and move each one through paid → shipped → delivered or cancel an unpaid one.
 - Rebuild the search index without downtime.
 
+## Shop designs
+
+| Design | Built for | Look |
+|---|---|---|
+| `footwear` | shoes and apparel | bold condensed type, size grid, square product shots |
+| `electronics` | gadgets and tech | graphite header, electric blue, product spotlight, capacity chips |
+| `grocery` | food and everyday items | fresh green, rounded type, aisle tiles, one-tap "Add" on every card |
+| `home` | furniture and decor | warm neutrals, editorial serif, large imagery, finish swatches |
+| `beauty` | cosmetics and fragrance | soft blush palette, elegant serif, shade swatches, routine strip |
+
+- **Switching:** under **Admin → Design**, pick a design, set the shop name, tagline and accent colour, and upload a logo. The storefront switches on the next page load.
+- **What changes:** colours, fonts, header, home page layout, product cards and how variant options are labelled (Size, Capacity, Pack size, Finish or Shade).
+- **What doesn't:** the backend, checkout, admin and data stay the same.
+
+To try a design with its matching demo products, start from an empty database:
+
+```bash
+docker compose down -v
+```
+
+```bash
+SHOP_DEMO_CATALOG=grocery docker compose up --build
+```
+
+The catalogs are `footwear` (the default), `electronics`, `grocery`, `home` and `beauty`; see [docs/demo-catalogs.md](docs/demo-catalogs.md).
+
 ## Quick start
 
 Requirements: Docker with Compose v2.
@@ -41,7 +69,7 @@ docker compose up --build
 | Emails sent by the shop | http://localhost:8025 | |
 | Object storage console | http://localhost:9001 | `shopdev` / `shopdev-secret-key` |
 
-On first start the backend creates the admin account and seeds 16 demo products (fictional brands).
+On first start the backend creates the admin account and seeds a demo catalog with fictional brands (shoes unless you set `SHOP_DEMO_CATALOG`).
 
 To override passwords and keys, copy `.env.example` to `.env`.
 
@@ -62,7 +90,7 @@ flowchart LR
 
 - **Stateless API.** Logins are short-lived RS256 JWTs plus rotating refresh tokens. A replayed refresh token revokes the whole session. Carts live in Redis, so any number of API instances can run behind a load balancer.
 - **BFF storefront.** The browser never sees an access token. The Next.js server keeps the tokens in httpOnly cookies and calls the API server-side. Catalog pages are cached and revalidated every 60s.
-- **Modular monolith.** There are ten modules: `identity`, `catalog`, `media`, `inventory`, `search`, `cart`, `orders`, `payments`, `notifications` and `backoffice`. Each exposes a small public API and hides its internals, and `ModularityTests` fails the build if a module reaches into another or if modules form a cycle.
+- **Modular monolith.** There are eleven modules: `identity`, `catalog`, `media`, `inventory`, `search`, `cart`, `orders`, `payments`, `notifications`, `backoffice` and `settings` (shop name and design). Each exposes a small public API and hides its internals, and `ModularityTests` fails the build if a module reaches into another or if modules form a cycle.
 - **Reliable events.** Search indexing, emails and payment outcomes flow as domain events stored in PostgreSQL (Spring Modulith's transactional outbox). If Meilisearch or the mail server is down, the work waits and is retried; it is never lost.
 - **Correct under concurrency.** A stock reservation is a single conditional `UPDATE` (`on_hand - reserved >= qty`). A test fires 40 parallel reservations at 5 units of stock and exactly 5 succeed.
 
@@ -135,6 +163,8 @@ Everything is set with environment variables. The most important ones:
 | `JWT_PRIVATE_KEY_LOCATION`, `JWT_PUBLIC_KEY_LOCATION` | generated | RSA key pair shared by all API instances |
 | `SHOP_ADMIN_EMAIL`, `SHOP_ADMIN_PASSWORD` | demo values | first admin account |
 | `SEED_DEMO_DATA` | `true` | seed demo products into an empty catalog |
+| `SHOP_DEMO_CATALOG` | `footwear` | which demo catalog to seed, and the initial design |
+| `SHOP_NAME` | `Z&A` | initial shop name (editable in Admin → Design) |
 | `API_URL` (storefront) | `http://localhost:8080` | API as reached from the Next.js server |
 
 ### Stripe
@@ -170,4 +200,6 @@ openssl rsa -in jwt-private.pem -pubout -out jwt-public.pem
 
 ## History
 
-This project began as a server-rendered Spring Boot 3 + Thymeleaf + MySQL shop (commit `8a3bd6a`). It was rebuilt into this headless architecture. The demo product photos come from the original version.
+This project began as a server-rendered Spring Boot 3 + Thymeleaf + MySQL shop (commit `8a3bd6a`). It was rebuilt into this headless architecture.
+
+The footwear demo photos come from that original version. The electronics, grocery, home and beauty images are original illustrations made for this project.

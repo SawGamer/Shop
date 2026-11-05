@@ -17,6 +17,7 @@ The backend is one deployable, split into modules: direct sub-packages of `com.z
 | `payments` | payment sessions, Stripe, test provider, webhooks | `PaymentService`, `PaymentEvents` |
 | `notifications` | transactional emails | – (listens to identity and orders events) |
 | `backoffice` | admin dashboard | – |
+| `settings` | shop name, storefront design, accent colour, logo | `ShopSettingsService` |
 
 Each module keeps its tables to itself. No foreign keys cross module boundaries (see `V1__initial_schema.sql`).
 

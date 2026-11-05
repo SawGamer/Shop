@@ -120,7 +120,11 @@ shop:
       secret-key: ${STRIPE_SECRET_KEY:}
       webhook-secret: ${STRIPE_WEBHOOK_SECRET:}
   notifications:
-    from-name: Z&A Shop
     from-address: ${MAIL_FROM:no-reply@za-shop.local}
+  settings:
+    name: ${SHOP_NAME:Z&A}
   seed:
     enabled: ${SEED_DEMO_DATA:true}
+    # Which demo catalog to load into an empty database: footwear, electronics, grocery, home or beauty.
+    # The shop's initial design matches it; admins can switch the design later.
+    catalog: ${SHOP_DEMO_CATALOG:footwear}

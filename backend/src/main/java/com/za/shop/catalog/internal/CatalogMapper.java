@@ -22,6 +22,7 @@ import com.za.shop.catalog.internal.CatalogDtos.VariantDto;
 import com.za.shop.inventory.InventoryService;
 import com.za.shop.inventory.StockLevel;
 import com.za.shop.shared.Money;
+import com.za.shop.shared.OptionOrder;
 import com.za.shop.shared.ShopProperties;
 
 @Component
@@ -87,8 +88,8 @@ class CatalogMapper {
     }
 
     static List<String> sizes(Product product) {
-        return product.getVariants().stream().map(ProductVariant::getSize).filter(Objects::nonNull).distinct()
-                .sorted(Sizes.ORDER).toList();
+        return OptionOrder.arrange(product.getVariants().stream().map(ProductVariant::getSize)
+                .filter(Objects::nonNull).distinct().toList());
     }
 
     static List<String> colors(Product product) {

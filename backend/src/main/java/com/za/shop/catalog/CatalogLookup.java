@@ -25,7 +25,7 @@ import com.za.shop.catalog.internal.Product;
 import com.za.shop.catalog.internal.ProductRepository;
 import com.za.shop.catalog.internal.ProductVariant;
 import com.za.shop.catalog.internal.ProductVariantRepository;
-import com.za.shop.catalog.internal.Sizes;
+import com.za.shop.shared.OptionOrder;
 
 /** Read-only catalog API for other modules. Returns plain records, never entities. */
 @Service
@@ -79,8 +79,8 @@ public class CatalogLookup {
             }
             ProductVariant cheapest = p.getVariants().stream()
                     .min(java.util.Comparator.comparingLong(ProductVariant::getPriceCents)).orElseThrow();
-            List<String> sizes = p.getVariants().stream().map(ProductVariant::getSize).filter(s -> s != null)
-                    .distinct().sorted(Sizes.ORDER).toList();
+            List<String> sizes = OptionOrder.arrange(p.getVariants().stream().map(ProductVariant::getSize).filter(s -> s != null)
+                    .distinct().toList());
             List<String> colors = p.getVariants().stream().map(ProductVariant::getColor).filter(c -> c != null)
                     .distinct().toList();
             Brand brand = p.getBrand();

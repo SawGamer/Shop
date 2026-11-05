@@ -17,6 +17,7 @@ import org.springframework.web.util.UriUtils;
 
 import com.za.shop.identity.VerificationEmailRequested;
 import com.za.shop.orders.OrderEvents;
+import com.za.shop.settings.ShopSettingsService;
 import com.za.shop.shared.ShopProperties;
 
 import jakarta.mail.MessagingException;
@@ -35,11 +36,14 @@ class EmailNotifications {
     private final JavaMailSender mail;
     private final NotificationProperties properties;
     private final ShopProperties shop;
+    private final ShopSettingsService settings;
 
-    EmailNotifications(JavaMailSender mail, NotificationProperties properties, ShopProperties shop) {
+    EmailNotifications(JavaMailSender mail, NotificationProperties properties, ShopProperties shop,
+            ShopSettingsService settings) {
         this.mail = mail;
         this.properties = properties;
         this.shop = shop;
+        this.settings = settings;
     }
 
     @ApplicationModuleListener
@@ -52,7 +56,7 @@ class EmailNotifications {
                 <p><a href="%s" style="background:#111;color:#fff;padding:12px 20px;border-radius:6px;\
                 text-decoration:none">Confirm email</a></p>
                 <p style="color:#666">If you did not create an account you can ignore this email.</p>
-                """.formatted(esc(event.firstName()), esc(properties.fromName()), esc(link)));
+                """.formatted(esc(event.firstName()), esc(settings.current().name()), esc(link)));
     }
 
     @ApplicationModuleListener
@@ -86,15 +90,16 @@ class EmailNotifications {
     }
 
     private void send(String to, String subject, String html) {
+        String shopName = settings.current().name();
         try {
             MimeMessage message = mail.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, "UTF-8");
-            helper.setFrom(properties.fromAddress(), properties.fromName());
+            helper.setFrom(properties.fromAddress(), shopName);
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText("""
                     <div style="font-family:system-ui,sans-serif;font-size:15px;line-height:1.5;color:#111">%s
-                    <p style="color:#888;font-size:12px">%s</p></div>""".formatted(html, esc(properties.fromName())),
+                    <p style="color:#888;font-size:12px">%s</p></div>""".formatted(html, esc(shopName)),
                     true);
             mail.send(message);
             log.info("Sent '{}' email", subject);
