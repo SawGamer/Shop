@@ -255,8 +255,11 @@ class FulfillmentTests extends IntegrationTest {
                 .andExpect(jsonPath("$.code").value("NOT_DELIVERABLE")).andExpect(jsonPath("$.errors.postalCode").exists());
         checkout(customer, CheckoutFlowTestsAddress.BODY).andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("VALIDATION_FAILED")).andExpect(jsonPath("$.errors.fulfillment").exists());
-        checkout(customer, delivery(p + "1", "123")).andExpect(status().isConflict())
-                .andExpect(jsonPath("$.code").value("SLOT_UNAVAILABLE")); // not a slot the shop offers
+        // A made-up slot id is rejected too (in a zone without a minimum, so the slot is what fails).
+        String open = prefix();
+        zone(admin, "Open " + open, List.of(open), 490, null, 0);
+        checkout(customer, delivery(open + "1", "123")).andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("SLOT_UNAVAILABLE"));
         mvc.perform(get("/api/v1/cart").header("Authorization", customer.bearer()))
                 .andExpect(jsonPath("$.itemCount").value(1)); // nothing was lost
     }
