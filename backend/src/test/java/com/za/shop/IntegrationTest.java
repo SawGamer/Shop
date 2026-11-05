@@ -41,6 +41,7 @@ import com.jayway.jsonpath.JsonPath;
         "shop.media.provider=local",
         "shop.media.public-base-url=http://localhost/media",
         "shop.orders.expiry-check-interval-ms=3600000",
+        "shop.catalog.deal-check-interval-ms=3600000",
         "shop.identity.refresh-reuse-grace=0s",
         "management.server.port=" })
 @AutoConfigureMockMvc

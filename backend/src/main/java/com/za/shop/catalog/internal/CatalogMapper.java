@@ -1,5 +1,6 @@
 package com.za.shop.catalog.internal;
 
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
@@ -30,26 +31,30 @@ class CatalogMapper {
 
     private final InventoryService inventory;
     private final ShopProperties shop;
+    private final Clock clock;
 
-    CatalogMapper(InventoryService inventory, ShopProperties shop) {
+    CatalogMapper(InventoryService inventory, ShopProperties shop, Clock clock) {
         this.inventory = inventory;
         this.shop = shop;
+        this.clock = clock;
     }
 
     ProductDetailDto detail(Product product) {
         Map<UUID, StockLevel> stock = stockOf(product);
+        Optional<Deal> running = product.runningDeal(clock.instant());
         List<VariantDto> variants = product.getVariants().stream().map(v -> {
             int available = stock.get(v.getId()).available();
-            return new VariantDto(v.getId(), v.getSku(), v.getSize(), v.getColor(), money(v.getPriceCents()),
-                    moneyOrNull(v.effectiveCompareAtCents()), available, available > 0);
+            Pricing.Effective price = Pricing.of(v, running);
+            return new VariantDto(v.getId(), v.getSku(), v.getSize(), v.getColor(), money(price.priceCents()),
+                    moneyOrNull(price.compareAtCents()), available, available > 0);
         }).toList();
-        Optional<ProductVariant> cheapest = cheapest(product);
+        Optional<Pricing.Effective> cheapest = cheapest(product).map(v -> Pricing.of(v, running));
         return new ProductDetailDto(product.getId(), product.getSlug(), product.getName(), product.getDescription(),
                 BrandDto.of(product.getBrand()), categories(product), images(product), sizes(product), colors(product),
-                variants, cheapest.map(v -> money(v.getPriceCents())).orElse(null),
-                cheapest.map(v -> moneyOrNull(v.effectiveCompareAtCents())).orElse(null),
+                variants, cheapest.map(p -> money(p.priceCents())).orElse(null),
+                cheapest.map(p -> moneyOrNull(p.compareAtCents())).orElse(null),
                 variants.stream().anyMatch(VariantDto::inStock), product.getStatus(), product.getCreatedAt(),
-                product.getUpdatedAt());
+                product.getUpdatedAt(), specs(product), running.map(CatalogDtos.DealDto::of).orElse(null));
     }
 
     AdminProductDto admin(Product product) {
@@ -66,7 +71,7 @@ class CatalogMapper {
                 variants, cheapest.map(v -> money(v.getPriceCents())).orElse(null),
                 cheapest.map(v -> moneyOrNull(v.effectiveCompareAtCents())).orElse(null),
                 variants.stream().anyMatch(AdminVariantDto::inStock), product.getStatus(), product.getCreatedAt(),
-                product.getUpdatedAt());
+                product.getUpdatedAt(), specs(product), product.deal().map(CatalogDtos.DealDto::of).orElse(null));
     }
 
     List<AdminProductSummaryDto> adminSummaries(List<Product> products) {
@@ -104,6 +109,10 @@ class CatalogMapper {
     private static List<CategoryRef> categories(Product product) {
         return product.getCategories().stream().sorted(Comparator.comparing(Category::getName)).map(CategoryRef::of)
                 .toList();
+    }
+
+    private static List<CatalogDtos.SpecDto> specs(Product product) {
+        return product.getSpecs().stream().map(CatalogDtos.SpecDto::of).toList();
     }
 
     private static List<ImageDto> images(Product product) {

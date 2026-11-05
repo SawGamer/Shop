@@ -69,8 +69,8 @@ class MeilisearchClient {
         Map<String, Object> settings = Map.of(
                 "searchableAttributes", List.of("name", "brandName", "categories", "colors", "description"),
                 "filterableAttributes", List.of("brand", "categories", "sizes", "colors", "price", "inStock",
-                        "onSale"),
-                "sortableAttributes", List.of("price", "createdAt"),
+                        "onSale", "onDeal", "specs"),
+                "sortableAttributes", List.of("price", "createdAt", "dealEndsAt"),
                 "faceting", Map.of("maxValuesPerFacet", 200),
                 "pagination", Map.of("maxTotalHits", 10_000));
         return http.patch().uri("/indexes/{index}/settings", index).body(settings).retrieve().body(Task.class);

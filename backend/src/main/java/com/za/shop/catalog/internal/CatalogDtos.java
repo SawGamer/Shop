@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import com.za.shop.shared.Money;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -44,10 +45,23 @@ public final class CatalogDtos {
             int available, boolean inStock) {
     }
 
+    public record SpecDto(String key, String group, String label, String value, boolean filterable) {
+        static SpecDto of(ProductSpec spec) {
+            return new SpecDto(spec.getSpecKey(), spec.getSpecGroup(), spec.getLabel(), spec.getSpecValue(),
+                    spec.isFilterable());
+        }
+    }
+
+    public record DealDto(int percentOff, Instant startsAt, Instant endsAt) {
+        static DealDto of(Deal deal) {
+            return new DealDto(deal.percentOff(), deal.startsAt(), deal.endsAt());
+        }
+    }
+
     public record ProductDetailDto(UUID id, String slug, String name, String description, BrandDto brand,
             List<CategoryRef> categories, List<ImageDto> images, List<String> sizes, List<String> colors,
             List<VariantDto> variants, Money price, Money compareAtPrice, boolean inStock, ProductStatus status,
-            Instant createdAt, Instant updatedAt) {
+            Instant createdAt, Instant updatedAt, List<SpecDto> specs, DealDto deal) {
     }
 
     public record AdminVariantDto(UUID id, String sku, String size, String color, Money price, Money compareAtPrice,
@@ -57,7 +71,7 @@ public final class CatalogDtos {
     public record AdminProductDto(UUID id, String slug, String name, String description, BrandDto brand,
             List<CategoryRef> categories, List<ImageDto> images, List<String> sizes, List<String> colors,
             List<AdminVariantDto> variants, Money price, Money compareAtPrice, boolean inStock, ProductStatus status,
-            Instant createdAt, Instant updatedAt) {
+            Instant createdAt, Instant updatedAt, List<SpecDto> specs, DealDto deal) {
     }
 
     public record AdminProductSummaryDto(UUID id, String slug, String name, BrandDto brand, ProductStatus status,
@@ -82,6 +96,22 @@ public final class CatalogDtos {
             @NotNull @Min(0) @Max(100_000_000) Long priceCents,
             @Min(0) @Max(100_000_000) Long compareAtPriceCents,
             @Min(0) @Max(1_000_000) Integer onHand) {
+    }
+
+    public record SpecInput(
+            @Size(max = 60) String group,
+            @NotBlank @Size(max = 80) String label,
+            @NotBlank @Size(max = 200) String value,
+            boolean filterable) {
+    }
+
+    public record SpecsUpsert(@NotNull @Size(max = 60) List<@NotNull @Valid SpecInput> specs) {
+    }
+
+    public record DealUpsert(
+            @NotNull @Min(1) @Max(90) Integer percentOff,
+            @NotNull Instant startsAt,
+            @NotNull Instant endsAt) {
     }
 
     public record CategoryUpsert(

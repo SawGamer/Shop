@@ -117,6 +117,7 @@ class ProductIndexer {
                 p.description(), p.brandId().toString(), p.brandSlug(), p.brandName(), p.categorySlugs(), p.sizes(),
                 p.colors(), p.minPriceCents(), p.compareAtPriceCents(), p.compareAtPriceCents() != null,
                 p.variantIds().stream().anyMatch(id -> stock.get(id).available() > 0), p.imageUrl(),
-                p.createdAt().getEpochSecond())).toList();
+                p.createdAt().getEpochSecond(), p.specFilters(), p.highlights(), p.dealEndsAt() != null,
+                p.dealEndsAt() == null ? null : p.dealEndsAt().getEpochSecond())).toList();
     }
 }

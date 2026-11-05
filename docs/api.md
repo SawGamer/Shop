@@ -236,6 +236,120 @@ With the fake provider (default in development, no Stripe keys needed) `paymentU
 page there with **Pay** and **Cancel** buttons that call the two endpoints above and then navigate to
 the success/cancelled page.
 
+## Specifications and deals (Phase 1)
+
+```ts
+type Spec = {
+  key: string;            // snake_case id derived from the label, e.g. "screen_size"
+  group: string | null;   // e.g. "Display", "Performance"
+  label: string;          // e.g. "Screen size"
+  value: string;          // e.g. "6.4″"
+  filterable: boolean     // shown as a search filter
+}
+type Deal = { percentOff: number; startsAt: string; endsAt: string }
+```
+
+- `ProductDetail` gains `specs: Spec[]` (in display order) and `deal: Deal | null`, which is set only
+  while the deal is running.
+- `AdminProduct` gains `specs: Spec[]` and `deal: Deal | null`. The admin `deal` is also set when the deal
+  is scheduled or has ended.
+- `ProductSummary` gains:
+  - `dealEndsAt: string | null` (only while a deal is running)
+  - `highlights: string[]` (up to 3 short lines, each the value followed by the label of the first filterable
+    specs, e.g. "8 GB RAM", "6.4″ Screen size")
+- **Pricing while a deal runs:** `price` is the discounted price and `compareAtPrice` the regular price.
+  This applies everywhere: product, search, cart, checkout and orders. Deal prices are rounded to the cent.
+  Search results can lag a deal's start or end by up to about 30 seconds; carts and orders are always exact.
+- Spec `key` is the label in snake_case, unique per product (so a label can be used once per product).
+- After upgrading an existing shop, run **Rebuild search index** once so old entries get the new fields.
+
+Search (`GET /products`) additions:
+
+| param | example | notes |
+|---|---|---|
+| `spec.<key>` | `spec.ram=8 GB&spec.ram=16 GB` | repeatable, OR within a key, AND across keys |
+| `deal` | `true` | only products with a running deal |
+| `sort` | `deal_ending` | running deals first, soonest ending first |
+
+`SearchResponse.facets` gains `specs: { key: string; label: string; values: FacetValue[] }[]`. It lists the
+filterable specs present in the results, and each one keeps its own counts when it is selected (disjunctive).
+
+Admin:
+
+| Method & path | Body | Response |
+|---|---|---|
+| `PUT /admin/products/{id}/specs` | `{ specs: { group?, label, value, filterable }[] }` (≤ 60, replaces all) | `200 AdminProduct` |
+| `PUT /admin/products/{id}/deal` | `{ percentOff (1–90), startsAt, endsAt }` (`endsAt` after `startsAt` and in the future) | `200 AdminProduct` |
+| `DELETE /admin/products/{id}/deal` | – | `200 AdminProduct` |
+
+## Fulfillment: delivery slots and click & collect (Phase 2)
+
+A shop runs in one of two modes, chosen in the shop settings (`fulfillmentMode`):
+
+- `SHIPPING`: parcel delivery with the flat shipping fee. Checkout works exactly as before.
+- `LOCAL`: delivery in time slots to postcodes the shop serves, or pickup in a store, plus a minimum order value.
+
+```ts
+type FulfillmentMethod = "DELIVERY" | "PICKUP"
+type Zone = { id: string; name: string; postcodePrefixes: string[]; feeCents: number; freeFromCents: number | null; minOrderCents: number }
+type Location = { id: string; name: string; address: Address; openingHours: string }   // Address as in the shared types
+type Slot = { id: string; startsAt: string; endsAt: string; remaining: number }          // remaining > 0
+type SlotDay = { date: string; slots: Slot[] }                                           // date = "2026-11-06", shop time zone
+type Fulfillment =
+  | { method: "DELIVERY"; slot: { startsAt: string; endsAt: string }; zoneName: string; feeCents: number }
+  | { method: "PICKUP"; slot: { startsAt: string; endsAt: string }; locationName: string }
+```
+
+- `ShopSettings` gains `fulfillmentMode: "SHIPPING" | "LOCAL"`, `timeZone` (IANA) and, in `LOCAL` mode,
+  `minOrder: Money | null` is the lowest `minOrderCents` over all zones (for a hint before a postcode is known).
+- `Order` gains `fulfillment: Fulfillment | null` (null in `SHIPPING` mode).
+- `Cart` gains `minOrder: Money | null` and `belowMinimum: boolean` once `?postcode=` is passed (see below).
+
+Public endpoints (`LOCAL` mode; `409 FULFILLMENT_DISABLED` in `SHIPPING` mode):
+
+| Method & path | Response |
+|---|---|
+| `GET /fulfillment/zone?postcode=10115` | `200 Zone` or `404 NOT_FOUND` when the shop does not deliver there |
+| `GET /fulfillment/locations` | `200 Location[]` |
+| `GET /fulfillment/slots?method=DELIVERY&postcode=10115&days=7` | `200 SlotDay[]` (bookable slots only, earliest first) |
+| `GET /fulfillment/slots?method=PICKUP&locationId={id}&days=7` | `200 SlotDay[]` |
+
+Checkout in `LOCAL` mode: `POST /checkout` body is
+`{ shippingAddress, fulfillment: { method, slotId, locationId? } }` where `locationId` is required for `PICKUP`.
+For `DELIVERY` the zone is derived from `shippingAddress.postalCode`.
+
+- The slot is booked atomically together with the stock reservation; if it filled up meanwhile:
+  `409 SLOT_UNAVAILABLE`. A postcode outside every zone: `400 NOT_DELIVERABLE` (`errors.postalCode`).
+  A cart below the zone's minimum: `400 BELOW_MINIMUM_ORDER` with `minOrder` and `subtotal` as `Money`.
+- The delivery fee replaces the flat shipping fee (free from `freeFromCents`); pickup is free.
+- A cancelled or expired order releases its slot.
+
+Reorder: `POST /orders/{id}/reorder` (customer, owner) adds the items of a past order to the cart where they are
+still sold and in stock, and returns `200 { cart: Cart, added: number, skipped: { productName, reason }[] }`
+(`reason`: `UNAVAILABLE` or `OUT_OF_STOCK`; quantities are capped to the available stock).
+
+Admin (role `ADMIN`):
+
+| Method & path | Body | Response |
+|---|---|---|
+| `GET /admin/fulfillment` | – | `200 { mode, timeZone, zones: Zone[], locations: Location[], schedule: Schedule }` |
+| `PUT /admin/fulfillment/mode` | `{ mode }` | `200 { mode }` |
+| `POST /admin/fulfillment/zones` / `PUT /admin/fulfillment/zones/{id}` | `{ name, postcodePrefixes (1–50, digits/letters), feeCents, freeFromCents?, minOrderCents }` | `200/201 Zone` |
+| `DELETE /admin/fulfillment/zones/{id}` | – | `204` |
+| `POST /admin/fulfillment/locations` / `PUT …/{id}` | `{ name, address, openingHours }` | `200/201 Location` |
+| `DELETE /admin/fulfillment/locations/{id}` | – | `204` |
+| `PUT /admin/fulfillment/schedule` | `Schedule` (below) | `200 Schedule` |
+
+```ts
+type Schedule = {
+  slotMinutes: number;        // 30–240
+  capacityPerSlot: number;    // orders per slot, 1–500
+  leadTimeMinutes: number;    // earliest booking from now
+  horizonDays: number;        // 1–14
+  openingHours: { dayOfWeek: 1|2|3|4|5|6|7; from: "08:00"; to: "20:00" }[]   // ISO weekday, shop time zone
+}
+```
+
 ## Shop settings and design
 
 One row of settings describes the shop: its name and the storefront design. The backend only stores and

@@ -22,5 +22,9 @@ public record ProductDocument(
         boolean onSale,
         boolean inStock,
         String imageUrl,
-        long createdAt) {
+        long createdAt,
+        List<String> specs,
+        List<String> highlights,
+        boolean onDeal,
+        Long dealEndsAt) {
 }

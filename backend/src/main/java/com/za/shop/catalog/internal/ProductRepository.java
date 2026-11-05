@@ -23,6 +23,15 @@ public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpec
     @Query("select p.id from Product p where p.status = com.za.shop.catalog.internal.ProductStatus.ACTIVE order by p.id")
     Page<UUID> findActiveIds(Pageable pageable);
 
+    @Query("select distinct s.specKey, s.label from ProductSpec s where s.filterable = true")
+    List<Object[]> findFilterableSpecLabels();
+
+    /** Products whose deal started or ended within the window (their prices changed). */
+    @Query("""
+            select p.id from Product p where p.dealStartsAt > :from and p.dealStartsAt <= :to
+               or p.dealEndsAt > :from and p.dealEndsAt <= :to""")
+    List<UUID> findIdsWithDealBoundaryBetween(java.time.Instant from, java.time.Instant to);
+
     @Query("select p.id from Product p where p.brand.id = :brandId")
     List<UUID> findIdsByBrand(UUID brandId);
 

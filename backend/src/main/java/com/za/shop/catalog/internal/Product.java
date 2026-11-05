@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -66,6 +67,16 @@ public class Product {
     @OrderBy("position asc, createdAt asc")
     private List<ProductImage> images = new ArrayList<>();
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("position asc")
+    private List<ProductSpec> specs = new ArrayList<>();
+
+    private Integer dealPercentOff;
+
+    private Instant dealStartsAt;
+
+    private Instant dealEndsAt;
+
     private Instant createdAt;
 
     private Instant updatedAt;
@@ -107,6 +118,36 @@ public class Product {
         this.updatedAt = now;
     }
 
+    public void setDeal(int percentOff, Instant startsAt, Instant endsAt, Instant now) {
+        this.dealPercentOff = percentOff;
+        this.dealStartsAt = startsAt;
+        this.dealEndsAt = endsAt;
+        touch(now);
+    }
+
+    public void clearDeal(Instant now) {
+        this.dealPercentOff = null;
+        this.dealStartsAt = null;
+        this.dealEndsAt = null;
+        touch(now);
+    }
+
+    /** The scheduled, running or finished deal, if any (admins see all of them). */
+    public Optional<Deal> deal() {
+        return dealPercentOff == null ? Optional.empty()
+                : Optional.of(new Deal(dealPercentOff, dealStartsAt, dealEndsAt));
+    }
+
+    /** The deal only while it is running (what shoppers get). */
+    public Optional<Deal> runningDeal(Instant now) {
+        return deal().filter(d -> d.isRunning(now));
+    }
+
+    public void replaceSpecs(List<ProductSpec> newSpecs) {
+        specs.clear();
+        specs.addAll(newSpecs);
+    }
+
     public boolean isPublished() {
         return status == ProductStatus.ACTIVE && !variants.isEmpty();
     }
@@ -141,6 +182,10 @@ public class Product {
 
     public List<ProductVariant> getVariants() {
         return variants;
+    }
+
+    public List<ProductSpec> getSpecs() {
+        return specs;
     }
 
     public List<ProductImage> getImages() {

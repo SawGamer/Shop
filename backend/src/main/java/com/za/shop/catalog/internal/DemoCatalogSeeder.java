@@ -2,6 +2,7 @@ package com.za.shop.catalog.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -84,6 +85,18 @@ class DemoCatalogSeeder implements ApplicationRunner {
                     int stock = random.nextInt(10) < 2 ? 0 : 1 + random.nextInt(catalog.stockRange());
                     admin.addVariant(product.id(), new VariantUpsert(String.format("%s-%02d", skuBase, ++n), size, color,
                             seed.priceCents(), seed.compareAtCents(), stock));
+                }
+            }
+            if (catalog.id().equals("electronics")) {
+                var specs = DemoExtras.SPECS.get(seed.name());
+                if (specs != null) {
+                    admin.replaceSpecs(product.id(), new CatalogDtos.SpecsUpsert(specs));
+                }
+                var deal = DemoExtras.DEALS.get(seed.name());
+                if (deal != null) {
+                    Instant now = Instant.now();
+                    admin.setDeal(product.id(), new CatalogDtos.DealUpsert(deal.percentOff(), now.minusSeconds(3600),
+                            now.plus(deal.endsIn())));
                 }
             }
             byte[] image = image(catalog.id(), seed.image());

@@ -26,7 +26,10 @@ import com.za.shop.catalog.internal.CatalogDtos.BrandDto;
 import com.za.shop.catalog.internal.CatalogDtos.BrandUpsert;
 import com.za.shop.catalog.internal.CatalogDtos.CategoryNode;
 import com.za.shop.catalog.internal.CatalogDtos.CategoryUpsert;
+import com.za.shop.catalog.internal.CatalogDtos.DealUpsert;
 import com.za.shop.catalog.internal.CatalogDtos.ProductUpsert;
+import com.za.shop.catalog.internal.CatalogDtos.SpecInput;
+import com.za.shop.catalog.internal.CatalogDtos.SpecsUpsert;
 import com.za.shop.catalog.internal.CatalogDtos.VariantUpsert;
 import com.za.shop.inventory.InventoryService;
 import com.za.shop.media.ImageProcessor;
@@ -120,6 +123,54 @@ class CatalogAdminService {
         Product product = product(id);
         product.archive(clock.instant());
         changed(product);
+    }
+
+    // ───────────── specs and deals ─────────────
+
+    AdminProductDto replaceSpecs(UUID productId, SpecsUpsert request) {
+        Product product = product(productId);
+        List<ProductSpec> specs = new java.util.ArrayList<>();
+        Set<String> keys = new HashSet<>();
+        for (SpecInput input : request.specs()) {
+            String key = Slugs.slugify(input.label()).replace('-', '_');
+            if (key.isEmpty() || key.length() > 60) {
+                throw ApiException.badRequest("VALIDATION_FAILED", "Invalid spec label '" + input.label() + "'");
+            }
+            if (!keys.add(key)) {
+                throw ApiException.badRequest("VALIDATION_FAILED",
+                        "Each spec label may be used once per product ('" + input.label() + "' appears twice)");
+            }
+            specs.add(new ProductSpec(product, specs.size(), key,
+                    input.group() == null || input.group().isBlank() ? null : input.group().trim(),
+                    input.label().trim(), input.value().trim(), input.filterable()));
+        }
+        product.replaceSpecs(specs);
+        product.touch(clock.instant());
+        changed(product);
+        return mapper.admin(product);
+    }
+
+    AdminProductDto setDeal(UUID productId, DealUpsert request) {
+        Instant now = clock.instant();
+        if (!request.endsAt().isAfter(request.startsAt())) {
+            throw ApiException.badRequest("VALIDATION_FAILED", "The deal must end after it starts")
+                    .with("errors", java.util.Map.of("endsAt", "must be after the start"));
+        }
+        if (!request.endsAt().isAfter(now)) {
+            throw ApiException.badRequest("VALIDATION_FAILED", "The deal must end in the future")
+                    .with("errors", java.util.Map.of("endsAt", "must be in the future"));
+        }
+        Product product = product(productId);
+        product.setDeal(request.percentOff(), request.startsAt(), request.endsAt(), now);
+        changed(product);
+        return mapper.admin(product);
+    }
+
+    AdminProductDto clearDeal(UUID productId) {
+        Product product = product(productId);
+        product.clearDeal(clock.instant());
+        changed(product);
+        return mapper.admin(product);
     }
 
     // ───────────── variants ─────────────

@@ -73,6 +73,21 @@ class AdminCatalogController {
         admin.archive(id);
     }
 
+    @PutMapping("/products/{id}/specs")
+    AdminProductDto replaceSpecs(@PathVariable UUID id, @Valid @RequestBody CatalogDtos.SpecsUpsert request) {
+        return admin.replaceSpecs(id, request);
+    }
+
+    @PutMapping("/products/{id}/deal")
+    AdminProductDto setDeal(@PathVariable UUID id, @Valid @RequestBody CatalogDtos.DealUpsert request) {
+        return admin.setDeal(id, request);
+    }
+
+    @DeleteMapping("/products/{id}/deal")
+    AdminProductDto clearDeal(@PathVariable UUID id) {
+        return admin.clearDeal(id);
+    }
+
     @PostMapping("/products/{id}/variants")
     @ResponseStatus(HttpStatus.CREATED)
     AdminProductDto addVariant(@PathVariable UUID id, @Valid @RequestBody VariantUpsert request) {
