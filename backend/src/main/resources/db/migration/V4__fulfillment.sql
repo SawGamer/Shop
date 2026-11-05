@@ -40,7 +40,7 @@ create table fulfillment_schedule (
 
 create table fulfillment_opening_hours (
     schedule_id smallint not null references fulfillment_schedule (id) on delete cascade,
-    day_of_week smallint not null check (day_of_week between 1 and 7),
+    day_of_week integer  not null check (day_of_week between 1 and 7),
     from_time   time     not null,
     to_time     time     not null,
     check (to_time > from_time)
