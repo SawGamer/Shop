@@ -46,6 +46,11 @@ The fulfillment mode is a shop setting: `SHIPPING` (parcel delivery, today's beh
 
 ## Phase 3 — Hardening for launch
 
+**Done so far:** password reset, saved addresses, account deletion, and editable legal pages (see below).
+**Still open:** invoices with VAT, refunds, payment tests with real Stripe keys, load test, monitoring and backups.
+These need input from the shop owner (VAT rate and company details, Stripe keys, a target environment).
+
+
 - **Customer accounts:** saved addresses, password reset, delete my account.
 - **Legal (Germany/EU):** imprint, terms and privacy pages; cookie consent; prices shown incl. VAT; invoices as PDF.
 - **Payments:** test against real Stripe, add refunds and partial refunds from admin, PayPal through Stripe.

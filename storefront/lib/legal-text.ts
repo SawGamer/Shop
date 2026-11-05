@@ -7,6 +7,9 @@ import type { PageSlug } from "./types";
  */
 export type LegalBlock = { type: "heading"; text: string } | { type: "paragraph"; lines: string[] };
 
+/** "## Title": two hashes followed by whitespace (or nothing at all). "##x" and "###" are ordinary text. */
+const HEADING = /^##(?:\s|$)/;
+
 export function parseLegalText(input: string | null | undefined): LegalBlock[] {
   if (!input) return [];
   const blocks: LegalBlock[] = [];
@@ -19,9 +22,10 @@ export function parseLegalText(input: string | null | undefined): LegalBlock[] {
     const line = raw.trimEnd();
     if (line.trim() === "") {
       flush();
-    } else if (line.startsWith("## ")) {
+    } else if (HEADING.test(line)) {
       flush();
-      const text = line.slice(3).trim();
+      // "##" or "## " with no text is a stray marker: it ends the paragraph and is dropped.
+      const text = line.slice(2).trim();
       if (text) blocks.push({ type: "heading", text });
     } else {
       lines.push(line);

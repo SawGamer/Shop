@@ -82,6 +82,15 @@ A shop can run in **local fulfillment** mode (the grocery demo does): customers 
 |---|---|
 | ![Slots](docs/images/grocery-checkout-slots.jpg) | ![Minimum order](docs/images/grocery-cart-minimum.jpg) |
 
+### Customer accounts and legal pages
+
+- **Password reset** by an emailed one-hour link. The answer never reveals whether an address has an account, at most one email goes out per minute per account, and a reset signs the account out everywhere.
+- **Saved addresses** (up to 10, one default) that prefill the checkout.
+- **Delete account** from Account → Settings: personal data is erased, orders are kept for tax purposes.
+- **Legal pages** (imprint, terms, privacy, returns) shown in every design's footer. They start as clearly marked **starter texts**; edit them in **Admin → Pages**. They are not legal advice: have them checked by a lawyer before you go live.
+
+![Pages editor](docs/images/admin-pages-editor.jpg)
+
 ## Quick start
 
 Requirements: Docker with Compose v2.
