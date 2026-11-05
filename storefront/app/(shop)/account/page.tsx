@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { AccountNav } from "@/components/account/account-nav";
 import { ResendVerificationButton } from "@/components/auth-forms";
 import { Pagination } from "@/components/pagination";
 import { ReorderButton } from "@/components/reorder-button";
@@ -33,6 +34,7 @@ export default async function AccountPage({ searchParams }: Props) {
   return (
     <Container className="py-10">
       <PageTitle>Hi, {user.firstName}</PageTitle>
+      <AccountNav current="/account" />
       <div className="grid gap-10 lg:grid-cols-[20rem_1fr]">
         <section aria-labelledby="profile" className="h-fit space-y-4 rounded-tag bg-white p-5">
           <h2 id="profile" className="headline text-xl">

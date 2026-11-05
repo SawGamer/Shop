@@ -5,6 +5,7 @@ import { CheckoutProvider, LocalCheckoutTotals } from "@/components/checkout-con
 import { CheckoutForm } from "@/components/checkout-form";
 import { LocalCheckoutForm } from "@/components/local-checkout-form";
 import { Container, PageTitle, ProductImage, ServiceDown } from "@/components/ui";
+import { getMyAddressesSafe } from "@/lib/addresses-data";
 import { requireUser } from "@/lib/auth";
 import { getCartSafe } from "@/lib/data";
 import { getFulfillmentConfig, getLocations, getPostcodeCookie, getZone } from "@/lib/fulfillment-data";
@@ -39,6 +40,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
     ? await Promise.all([postcode ? getZone(postcode) : Promise.resolve(null), getLocations()])
     : [null, []];
   const defaultName = `${user.firstName} ${user.lastName}`.trim();
+  const addresses = await getMyAddressesSafe();
 
   const page = (
     <Container className="py-10">
@@ -52,9 +54,10 @@ export default async function CheckoutPage({ searchParams }: Props) {
               locations={locations}
               timeZone={timeZone}
               initialPostcode={postcode}
+              addresses={addresses}
             />
           ) : (
-            <CheckoutForm defaultName={defaultName} itemNames={itemNames} />
+            <CheckoutForm defaultName={defaultName} itemNames={itemNames} addresses={addresses} />
           )}
         </div>
         <aside aria-label="Order summary" className="h-fit rounded-tag bg-white p-5">

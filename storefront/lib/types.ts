@@ -367,6 +367,7 @@ export type ErrorCode =
   | "NOT_DELIVERABLE"
   | "BELOW_MINIMUM_ORDER"
   | "FULFILLMENT_DISABLED"
+  | "ADDRESS_LIMIT"
   | "API_UNAVAILABLE"
   | "UNKNOWN";
 
@@ -396,3 +397,15 @@ export type ShopSettingsUpdate = {
   theme: string;
   accentColor: string | null;
 };
+
+// ───────────── Customer accounts and content pages (Phase 3) ─────────────
+
+export type SavedAddress = Address & { id: string; label: string | null; isDefault: boolean };
+
+export type SavedAddressInput = Address & { label?: string | null; isDefault?: boolean };
+
+export type PageSlug = "imprint" | "terms" | "privacy" | "returns";
+
+export type PageSummary = { slug: PageSlug; title: string; isTemplate: boolean };
+
+export type ContentPage = PageSummary & { body: string; updatedAt: string | null };

@@ -1,9 +1,10 @@
 import Link from "next/link";
+import { getPageSummaries } from "@/lib/legal-data";
 import { getShop } from "@/lib/shop";
 import { Container } from "./ui";
 
 export async function SiteFooter() {
-  const { settings, theme } = await getShop();
+  const [{ settings, theme }, pages] = await Promise.all([getShop(), getPageSummaries()]);
   return (
     <footer className="mt-24 bg-ink text-paper">
       <Container className="grid gap-10 py-12 sm:grid-cols-[2fr_1fr_1fr]">
@@ -52,8 +53,21 @@ export async function SiteFooter() {
           </ul>
         </div>
       </Container>
-      <Container className="border-t border-paper/15 py-5 text-xs text-paper/50">
-        © {new Date().getFullYear()} {settings.name}
+      <Container className="flex flex-col gap-3 border-t border-paper/15 py-5 text-xs text-paper/60 sm:flex-row sm:items-center sm:justify-between">
+        <p>
+          © {new Date().getFullYear()} {settings.name}
+        </p>
+        <nav aria-label="Legal">
+          <ul className="flex flex-wrap gap-x-5 gap-y-2">
+            {pages.map((p) => (
+              <li key={p.slug}>
+                <Link href={`/legal/${p.slug}`} className="hover:text-paper hover:underline">
+                  {p.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
       </Container>
     </footer>
   );

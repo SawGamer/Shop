@@ -81,6 +81,7 @@ const KNOWN_CODES = new Set<ErrorCode>([
   "NOT_DELIVERABLE",
   "BELOW_MINIMUM_ORDER",
   "FULFILLMENT_DISABLED",
+  "ADDRESS_LIMIT",
 ]);
 
 function fallbackCode(status: number): ErrorCode {

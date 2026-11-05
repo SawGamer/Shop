@@ -66,6 +66,8 @@ export function toActionState(e: unknown, fallback = "That didn't work. Try agai
           : e.detail || "Your cart is below the minimum order for delivery.",
       );
     }
+    case "ADDRESS_LIMIT":
+      return fail("You can save up to 10 addresses. Delete one you no longer use first.");
     case "FULFILLMENT_DISABLED":
       return fail("Delivery slots aren't available in this shop right now. Reload the page and try again.");
     case "API_UNAVAILABLE":

@@ -12,8 +12,10 @@ import { lookupZone } from "@/lib/actions/fulfillment";
 import { placeOrder } from "@/lib/actions/checkout";
 import { centsToMinimum, isPlausiblePostcode, normalizePostcode } from "@/lib/fulfillment";
 import { COUNTRIES } from "@/lib/format";
+import { pickDefaultAddress, savedAddressToFields } from "@/lib/addresses";
 import { formatMoney } from "@/lib/money";
-import type { FulfillmentMethod, PickupLocation, Zone } from "@/lib/types";
+import type { FulfillmentMethod, PickupLocation, SavedAddress, Zone } from "@/lib/types";
+import { SavedAddressPicker } from "./saved-address-picker";
 
 const METHODS: { id: FulfillmentMethod; title: string; hint: string }[] = [
   { id: "DELIVERY", title: "Delivery", hint: "To your door in a time window" },
@@ -29,7 +31,10 @@ export function LocalCheckoutForm({
   locations,
   timeZone,
   initialPostcode,
+  addresses = [],
 }: {
+  /** The customer's saved addresses; the default one pre-fills the delivery address. */
+  addresses?: SavedAddress[];
   defaultName: string;
   itemNames: Record<string, string>;
   locations: PickupLocation[];
@@ -54,7 +59,9 @@ export function LocalCheckoutForm({
   const fe = state.fieldErrors ?? {};
   const v = state.values ?? {};
 
-  const [postcode, setPostcode] = useState(v.postalCode ?? initialPostcode ?? "");
+  const saved = pickDefaultAddress(addresses);
+  const init = saved ? savedAddressToFields(saved) : null;
+  const [postcode, setPostcode] = useState(v.postalCode ?? (init?.postalCode || initialPostcode || ""));
   const location = locations.find((l) => l.id === locationId) ?? null;
 
   // Check the postcode against the delivery zones as the customer types. The answer is kept together
@@ -133,9 +140,10 @@ export function LocalCheckoutForm({
       {method === "DELIVERY" ? (
         <fieldset className="space-y-4">
           <legend className="headline mb-1 text-xl">Delivery address</legend>
-          <Field label="Full name" name="fullName" autoComplete="name" defaultValue={v.fullName ?? defaultName} required error={fe.fullName} />
-          <Field label="Street and house number" name="line1" autoComplete="address-line1" defaultValue={v.line1} required error={fe.line1} />
-          <Field label="Apartment, floor, c/o" name="line2" autoComplete="address-line2" defaultValue={v.line2} hint="Optional" error={fe.line2} />
+          <SavedAddressPicker addresses={addresses} defaultId={saved?.id ?? null} />
+          <Field label="Full name" name="fullName" autoComplete="name" defaultValue={v.fullName ?? (init?.fullName || defaultName)} required error={fe.fullName} />
+          <Field label="Street and house number" name="line1" autoComplete="address-line1" defaultValue={v.line1 ?? init?.line1} required error={fe.line1} />
+          <Field label="Apartment, floor, c/o" name="line2" autoComplete="address-line2" defaultValue={v.line2 ?? init?.line2} hint="Optional" error={fe.line2} />
           <div className="grid gap-4 sm:grid-cols-[10rem_1fr]">
             <div>
               <Field
@@ -155,16 +163,16 @@ export function LocalCheckoutForm({
                 {zoneCheck === "checking" ? "Checking…" : zoneCheck === "ok" && zone ? `Delivery area: ${zone.name}` : ""}
               </p>
             </div>
-            <Field label="City" name="city" autoComplete="address-level2" defaultValue={v.city} required error={fe.city} />
+            <Field label="City" name="city" autoComplete="address-level2" defaultValue={v.city ?? init?.city} required error={fe.city} />
           </div>
-          <SelectField label="Country" name="country" autoComplete="country" defaultValue={v.country ?? "DE"} key={v.country ?? "DE"} error={fe.country}>
+          <SelectField label="Country" name="country" autoComplete="country" defaultValue={v.country ?? (init?.country || "DE")} key={v.country ?? "DE"} error={fe.country}>
             {COUNTRIES.map((c) => (
               <option key={c.code} value={c.code}>
                 {c.name}
               </option>
             ))}
           </SelectField>
-          <Field label="Phone" name="phone" type="tel" autoComplete="tel" defaultValue={v.phone} hint="Optional. The driver may call if they can't find you." error={fe.phone} />
+          <Field label="Phone" name="phone" type="tel" autoComplete="tel" defaultValue={v.phone ?? init?.phone} hint="Optional. The driver may call if they can't find you." error={fe.phone} />
         </fieldset>
       ) : (
         <fieldset className="space-y-4">

@@ -7,6 +7,9 @@ import { Notice } from "./ui";
 import { placeOrder } from "@/lib/actions/checkout";
 import { IDLE, type ActionState } from "@/lib/action-state";
 import { COUNTRIES } from "@/lib/format";
+import { pickDefaultAddress, savedAddressToFields } from "@/lib/addresses";
+import type { SavedAddress } from "@/lib/types";
+import { SavedAddressPicker } from "./saved-address-picker";
 
 /** The error banner above the checkout form: sold-out items, or the message of any other failure. */
 export function CheckoutNotice({ state, itemNames }: { state: ActionState; itemNames: Record<string, string> }) {
@@ -36,14 +39,19 @@ export function CheckoutNotice({ state, itemNames }: { state: ActionState; itemN
 export function CheckoutForm({
   defaultName,
   itemNames,
+  addresses = [],
 }: {
   defaultName: string;
   /** variantId → "Product, size 42" for readable stock errors. */
   itemNames: Record<string, string>;
+  /** The customer's saved addresses; the default one pre-fills the form. */
+  addresses?: SavedAddress[];
 }) {
   const [state, formAction] = useActionState(placeOrder, IDLE);
   const fe = state.fieldErrors ?? {};
   const v = state.values ?? {};
+  const saved = pickDefaultAddress(addresses);
+  const init = saved ? savedAddressToFields(saved) : null;
 
   return (
     <form action={formAction} className="space-y-5" noValidate>
@@ -51,21 +59,22 @@ export function CheckoutForm({
 
       <fieldset className="space-y-4">
         <legend className="headline mb-1 text-xl">Shipping address</legend>
-        <Field label="Full name" name="fullName" autoComplete="name" defaultValue={v.fullName ?? defaultName} required error={fe.fullName} />
-        <Field label="Street and house number" name="line1" autoComplete="address-line1" defaultValue={v.line1} required error={fe.line1} />
+        <SavedAddressPicker addresses={addresses} defaultId={saved?.id ?? null} />
+        <Field label="Full name" name="fullName" autoComplete="name" defaultValue={v.fullName ?? (init?.fullName || defaultName)} required error={fe.fullName} />
+        <Field label="Street and house number" name="line1" autoComplete="address-line1" defaultValue={v.line1 ?? init?.line1} required error={fe.line1} />
         <Field
           label="Apartment, floor, c/o"
           name="line2"
           autoComplete="address-line2"
-          defaultValue={v.line2}
+          defaultValue={v.line2 ?? init?.line2}
           hint="Optional"
           error={fe.line2}
         />
         <div className="grid gap-4 sm:grid-cols-[10rem_1fr]">
-          <Field label="Postal code" name="postalCode" autoComplete="postal-code" defaultValue={v.postalCode} required error={fe.postalCode} />
-          <Field label="City" name="city" autoComplete="address-level2" defaultValue={v.city} required error={fe.city} />
+          <Field label="Postal code" name="postalCode" autoComplete="postal-code" defaultValue={v.postalCode ?? init?.postalCode} required error={fe.postalCode} />
+          <Field label="City" name="city" autoComplete="address-level2" defaultValue={v.city ?? init?.city} required error={fe.city} />
         </div>
-        <SelectField label="Country" name="country" autoComplete="country" defaultValue={v.country ?? "DE"} key={v.country ?? "DE"} error={fe.country}>
+        <SelectField label="Country" name="country" autoComplete="country" defaultValue={v.country ?? (init?.country || "DE")} key={v.country ?? "DE"} error={fe.country}>
           {COUNTRIES.map((c) => (
             <option key={c.code} value={c.code}>
               {c.name}
@@ -77,7 +86,7 @@ export function CheckoutForm({
           name="phone"
           type="tel"
           autoComplete="tel"
-          defaultValue={v.phone}
+          defaultValue={v.phone ?? init?.phone}
           hint="Optional. Only used by the delivery service."
           error={fe.phone}
         />
