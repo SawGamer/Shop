@@ -59,7 +59,7 @@ export default async function ProductPage({ params }: Props) {
       </nav>
 
       <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:gap-12">
-        <ProductGallery images={product.images} name={product.name} />
+        <ProductGallery images={product.images} name={product.name} portrait={layout.card === "cover"} />
         <div className="lg:sticky lg:top-6 lg:self-start">
           {product.deal && (
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-tag bg-signal px-4 py-2.5 text-white">

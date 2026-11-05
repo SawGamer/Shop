@@ -8,7 +8,7 @@ Principles:
 - **One owner per shop in version 1.** The shop owner (admin) adds and manages all products. Other sellers
   come in version 2.
 - **Keep genres separate.** Each deployment is one shop with one genre design (`footwear`, `electronics`,
-  `grocery`, `home`, `beauty`).
+  `grocery`, `home`, `beauty`, `sports`, `books`, `gourmet`).
 - **Genre features are switched on per shop**, not hard-wired to a design. A home shop could use click &
   collect, for example.
 - **Every phase ships on its own** with tests, docs and a working demo.
@@ -16,7 +16,7 @@ Principles:
 ## Done (current PR)
 
 - The headless platform: Spring Boot API, Next.js storefront, admin, Stripe, search, carts, orders, CI and Docker.
-- Five genre designs, an admin Design page and a demo catalog per genre.
+- Eight genre designs (footwear, electronics, grocery, home, beauty, sports, books, gourmet), an admin Design page and a demo catalog per genre.
 
 ## Phase 1 — Big electronics store tools (done)
 

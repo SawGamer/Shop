@@ -2,7 +2,7 @@
 
 A headless e-commerce platform: a **Spring Boot 4 API** (Java 21) and a **Next.js 16 storefront with an admin dashboard**. It's built as a modular monolith that can scale out horizontally, the same path Shopify took before splitting anything into separate services.
 
-The storefront comes with **five designs for different kinds of shops**: footwear, electronics, grocery, home & furniture, and beauty. Admins switch between them live, with no redeploy. Each design has a matching demo catalog.
+The storefront comes with **eight designs for different kinds of shops**: footwear, electronics, grocery, home & furniture, beauty, sports & outdoor, books & media, and gourmet (restaurants, sweets, chocolate). Admins switch between them live, with no redeploy. Each design has a matching demo catalog.
 
 ![Storefront home page](docs/images/storefront-home.jpg)
 
@@ -36,13 +36,20 @@ The storefront comes with **five designs for different kinds of shops**: footwea
 | `grocery` | food and everyday items | fresh green, rounded type, aisle tiles, one-tap "Add" on every card |
 | `home` | furniture and decor | warm neutrals, editorial serif, large imagery, finish swatches |
 | `beauty` | cosmetics and fragrance | soft blush palette, elegant serif, shade swatches, routine strip |
+| `sports` | sports and outdoor gear | charcoal with signal orange and lime, condensed type, activity tiles, spotlight product |
+| `books` | bookshops and media | library paper, ink blue and burgundy, book serif, cover-first cards, genre shelves, format chips |
+| `gourmet` | restaurants, bakeries, chocolate makers | cocoa and cream, display serif, big appetising cards, pickup-and-delivery band |
 
 | Electronics | Grocery | Home | Beauty |
 |---|---|---|---|
 | ![Electronics design](docs/images/design-electronics.jpg) | ![Grocery design](docs/images/design-grocery.jpg) | ![Home design](docs/images/design-home.jpg) | ![Beauty design](docs/images/design-beauty.jpg) |
 
+| Sports & outdoor | Books & media | Gourmet |
+|---|---|---|
+| ![Sports design](docs/images/design-sports.jpg) | ![Books design](docs/images/design-books.jpg) | ![Gourmet design](docs/images/design-gourmet.jpg) |
+
 - **Switching:** under **Admin → Design**, pick a design, set the shop name, tagline and accent colour, and upload a logo. The storefront switches on the next page load.
-- **What changes:** colours, fonts, header, home page layout, product cards and how variant options are labelled (Size, Capacity, Pack size, Finish or Shade).
+- **What changes:** colours, fonts, header, home page layout, product cards and how variant options are labelled (Size, Capacity, Pack size, Finish, Shade, Format or Portion).
 - **What doesn't:** the backend, checkout, admin and data stay the same.
 
 To try a design with its matching demo products, start from an empty database:
@@ -55,7 +62,7 @@ docker compose down -v
 SHOP_DEMO_CATALOG=grocery docker compose up --build
 ```
 
-The catalogs are `footwear` (the default), `electronics`, `grocery`, `home` and `beauty`; see [docs/demo-catalogs.md](docs/demo-catalogs.md).
+The catalogs are `footwear` (the default), `electronics`, `grocery`, `home`, `beauty`, `sports`, `books` and `gourmet`; see [docs/demo-catalogs.md](docs/demo-catalogs.md).
 
 ### Electronics store tools
 
@@ -240,4 +247,4 @@ openssl rsa -in jwt-private.pem -pubout -out jwt-public.pem
 
 This project began as a server-rendered Spring Boot 3 + Thymeleaf + MySQL shop (commit `8a3bd6a`). It was rebuilt into this headless architecture.
 
-The footwear demo photos come from that original version. The electronics, grocery, home and beauty images are original illustrations made for this project.
+The footwear demo photos come from that original version. The electronics, grocery, home, beauty, sports, books and gourmet images are original illustrations made for this project.

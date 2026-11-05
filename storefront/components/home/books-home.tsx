@@ -44,7 +44,7 @@ export function BooksHome({ data, theme }: HomeProps) {
               {covers.map((p, i) => (
                 <li key={p.id} className={clsx("relative -mx-3 w-[36%] max-w-52 transition-transform hover:z-20 hover:-translate-y-2", tilt[i])}>
                   <Link href={`/p/${p.slug}`} aria-label={`${p.name}, ${p.brand.name}`} className="block">
-                    <div className="aspect-[3/4] overflow-hidden rounded-r-[3px] bg-cloud shadow-[0_18px_30px_-10px_rgba(0,0,0,0.6)]">
+                    <div className="aspect-[2/3] overflow-hidden rounded-r-[3px] bg-cloud shadow-[0_18px_30px_-10px_rgba(0,0,0,0.6)]">
                       <ProductImage src={p.imageUrl} alt={p.name} name={p.name} sizes="lg" />
                     </div>
                   </Link>

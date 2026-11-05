@@ -258,7 +258,7 @@ function CoverCard({ product }: { product: ProductSummary }) {
   return (
     <Link href={`/p/${product.slug}`} className="group flex h-full flex-col">
       <div className="relative bg-cloud px-5 pb-5 pt-6">
-        <div className="relative aspect-[3/4] overflow-hidden rounded-r-[3px] rounded-l-[1px] shadow-[inset_6px_0_6px_-4px_rgba(0,0,0,0.28),4px_6px_14px_-4px_rgba(27,36,56,0.45)] transition-transform duration-300 group-hover:-translate-y-1">
+        <div className="relative aspect-[2/3] overflow-hidden rounded-r-[3px] rounded-l-[1px] shadow-[inset_6px_0_6px_-4px_rgba(0,0,0,0.28),4px_6px_14px_-4px_rgba(27,36,56,0.45)] transition-transform duration-300 group-hover:-translate-y-1">
           <ProductImage src={product.imageUrl} alt={product.name} name={product.name} />
           <span aria-hidden className="absolute inset-y-0 left-1.5 w-px bg-black/20" />
         </div>
