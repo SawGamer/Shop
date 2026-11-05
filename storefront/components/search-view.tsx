@@ -8,7 +8,16 @@ import { compareSizes, swatchFor } from "@/lib/colors";
 import { searchProducts } from "@/lib/data";
 import { pluralize } from "@/lib/format";
 import { formatMoney } from "@/lib/money";
-import { hasActiveFilters, searchHref, SORT_LABELS, SORTS, toggle, type SearchQuery } from "@/lib/search";
+import {
+  hasActiveFilters,
+  searchHref,
+  SORT_LABELS,
+  SORTS,
+  specParams,
+  toggle,
+  toggleSpec,
+  type SearchQuery,
+} from "@/lib/search";
 import { getShop } from "@/lib/shop";
 import type { Theme } from "@/lib/themes";
 import type { FacetValue, SearchResponse } from "@/lib/types";
@@ -141,7 +150,10 @@ export async function SearchView({ query, base, fixedCategory }: Props) {
   }
 
   const sortValue = q.sort || (q.q ? "relevance" : "newest");
-  const sortOptions = SORTS.filter((s) => s !== "relevance" || q.q).map((s) => ({
+  const specFacets = result.facets.specs ?? [];
+  const specLabel = (key: string) => specFacets.find((f) => f.key === key)?.label ?? key.replace(/_/g, " ");
+
+  const sortOptions = SORTS.filter((s) => (s !== "relevance" || q.q) && (s !== "deal_ending" || q.deal)).map((s) => ({
     value: s,
     label: SORT_LABELS[s],
     href: href({ sort: s }),
@@ -173,6 +185,12 @@ export async function SearchView({ query, base, fixedCategory }: Props) {
   }
   if (q.inStock) chips.push({ label: "In stock", href: href({ inStock: false }) });
   if (q.onSale) chips.push({ label: "On sale", href: href({ onSale: false }) });
+  if (q.deal) chips.push({ label: "Deals of the day", href: href({ deal: false, sort: q.sort === "deal_ending" ? "" : q.sort }) });
+  for (const [key, values] of Object.entries(q.specs)) {
+    for (const v of values) {
+      chips.push({ label: `${specLabel(key)}: ${v}`, href: href({ specs: toggleSpec(q.specs, key, v) }) });
+    }
+  }
 
   const filters = (
     <div>
@@ -207,6 +225,21 @@ export async function SearchView({ query, base, fixedCategory }: Props) {
           </span>
           On sale
         </Link>
+        <Link
+          href={href({ deal: !q.deal, sort: q.deal ? (q.sort === "deal_ending" ? "" : q.sort) : "deal_ending" })}
+          scroll={false}
+          role="checkbox"
+          aria-checked={q.deal}
+          className="flex items-center gap-2.5 rounded-control px-1 py-1 text-sm font-semibold hover:bg-cloud"
+        >
+          <span
+            aria-hidden
+            className={clsx("h-5 w-9 rounded-full p-0.5 transition-colors", q.deal ? "bg-cobalt" : "bg-mist")}
+          >
+            <span className={clsx("block size-4 rounded-full bg-white transition-transform", q.deal && "translate-x-4")} />
+          </span>
+          Deals of the day
+        </Link>
       </div>
       {!omitCategory && (
         <FacetGroup
@@ -238,6 +271,15 @@ export async function SearchView({ query, base, fixedCategory }: Props) {
           );
         }}
       />
+      {specFacets.map((f) => (
+        <FacetGroup
+          key={f.key}
+          title={f.label}
+          values={f.values}
+          isOn={(v) => (q.specs[f.key] ?? []).includes(v)}
+          hrefFor={(v) => href({ specs: toggleSpec(q.specs, f.key, v) })}
+        />
+      ))}
       <form action={base} method="get" className="border-t border-mist py-4">
         <p className="mb-2 text-sm font-semibold">Price</p>
         {q.q && <input type="hidden" name="q" value={q.q} />}
@@ -253,6 +295,10 @@ export async function SearchView({ query, base, fixedCategory }: Props) {
         ))}
         {q.inStock && <input type="hidden" name="inStock" value="true" />}
         {q.onSale && <input type="hidden" name="onSale" value="true" />}
+        {q.deal && <input type="hidden" name="deal" value="true" />}
+        {specParams(q.specs).map(([name, value]) => (
+          <input key={`${name}-${value}`} type="hidden" name={name} value={value} />
+        ))}
         {q.sort && <input type="hidden" name="sort" value={q.sort} />}
         <div className="flex items-center gap-2">
           <label className="sr-only" htmlFor="price-min">
@@ -326,7 +372,7 @@ export async function SearchView({ query, base, fixedCategory }: Props) {
             ))}
             {hasActiveFilters(q, omitCategory) && (
               <Link
-                href={searchHref(base, { ...q, brand: [], size: [], color: [], min: "", max: "", inStock: false, onSale: false, category: omitCategory ? q.category : "" }, {}, omitCategory)}
+                href={searchHref(base, { ...q, brand: [], size: [], color: [], min: "", max: "", inStock: false, onSale: false, deal: false, specs: {}, sort: q.sort === "deal_ending" ? "" : q.sort, category: omitCategory ? q.category : "" }, {}, omitCategory)}
                 className="text-sm font-semibold text-cobalt hover:underline"
               >
                 Clear filters

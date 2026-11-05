@@ -39,5 +39,5 @@ export const grocery: Theme = {
     metaDescription: "Fresh groceries delivered the same day.",
     announcement: "Free delivery over €50 · Order by 2 pm for same-day delivery",
   },
-  layout: { header: "market", card: "market", sizeOptions: "chips", colorOptions: "chips", buyBox: "card" },
+  layout: { header: "market", card: "market", sizeOptions: "chips", colorOptions: "chips", buyBox: "card", megaMenu: false, compareOnCards: false },
 };

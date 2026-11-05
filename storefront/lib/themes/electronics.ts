@@ -39,5 +39,5 @@ export const electronics: Theme = {
     metaDescription: "Phones, laptops, audio and smart home devices.",
     announcement: null,
   },
-  layout: { header: "tech", card: "tech", sizeOptions: "chips", colorOptions: "chips", buyBox: "card" },
+  layout: { header: "tech", card: "tech", sizeOptions: "chips", colorOptions: "chips", buyBox: "card", megaMenu: true, compareOnCards: true },
 };

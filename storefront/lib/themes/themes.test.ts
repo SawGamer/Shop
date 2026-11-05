@@ -24,6 +24,8 @@ describe("theme registry", () => {
       }
       expect(t.layout.header).toBeTruthy();
       expect(t.layout.card).toBeTruthy();
+      expect(typeof t.layout.megaMenu).toBe("boolean");
+      expect(typeof t.layout.compareOnCards).toBe("boolean");
       expect(t.themeColor).toMatch(/^#[0-9a-f]{6}$/i);
     }
   });

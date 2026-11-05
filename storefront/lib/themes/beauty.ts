@@ -39,5 +39,5 @@ export const beauty: Theme = {
     metaDescription: "Skincare, makeup and fragrance.",
     announcement: "Free samples with every order · Free shipping over €50",
   },
-  layout: { header: "boutique", card: "boutique", sizeOptions: "chips", colorOptions: "swatches", buyBox: "card" },
+  layout: { header: "boutique", card: "boutique", sizeOptions: "chips", colorOptions: "swatches", buyBox: "card", megaMenu: false, compareOnCards: false },
 };

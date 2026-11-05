@@ -9,7 +9,7 @@ type Props = { searchParams: Promise<RawSearchParams> };
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const q = parseSearchParams(await searchParams);
   const { theme } = await getShop();
-  return { title: q.q ? `“${q.q}”` : q.onSale ? "Sale" : theme.labels.allProducts };
+  return { title: q.q ? `“${q.q}”` : q.deal ? "Deals of the day" : q.onSale ? "Sale" : theme.labels.allProducts };
 }
 
 export default async function SearchPage({ searchParams }: Props) {
@@ -17,7 +17,9 @@ export default async function SearchPage({ searchParams }: Props) {
   const { theme } = await getShop();
   const title = query.q
     ? `Results for “${query.q}”`
-    : query.onSale
+    : query.deal
+      ? "Deals of the day"
+      : query.onSale
       ? theme.copy.saleTitle
       : query.sort === "newest"
         ? theme.copy.newTitle

@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CompareToggle } from "@/components/compare";
+import { DealCountdown } from "@/components/deal-countdown";
 import { ProductGallery } from "@/components/product-gallery";
+import { SpecTable } from "@/components/spec-table";
 import { VariantPicker } from "@/components/variant-picker";
 import { Container } from "@/components/ui";
 import { getProduct } from "@/lib/data";
@@ -58,6 +61,14 @@ export default async function ProductPage({ params }: Props) {
       <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:gap-12">
         <ProductGallery images={product.images} name={product.name} />
         <div className="lg:sticky lg:top-6 lg:self-start">
+          {product.deal && (
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-tag bg-signal px-4 py-2.5 text-white">
+              <p className="text-sm font-bold">
+                Deal of the day <span className="ml-1 rounded-full bg-white/20 px-2 py-0.5">−{product.deal.percentOff}%</span>
+              </p>
+              <DealCountdown endsAt={product.deal.endsAt} tone="inverse" />
+            </div>
+          )}
           <VariantPicker
             product={product}
             labels={{ size: labels.size, sizeShort: labels.sizeShort, color: labels.color, choose: labels.choose }}
@@ -65,8 +76,23 @@ export default async function ProductPage({ params }: Props) {
             colorOptions={layout.colorOptions}
             buyBox={layout.buyBox}
           />
+          <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
+            <CompareToggle
+              slug={product.slug}
+              name={product.name}
+              imageUrl={product.images[0]?.url ?? null}
+              variant="inline"
+            />
+            {(product.specs?.length ?? 0) > 0 && (
+              <a href="#specifications" className="text-xs font-semibold text-cobalt hover:underline">
+                See all {product.specs!.length} specifications
+              </a>
+            )}
+          </div>
         </div>
       </div>
+
+      <SpecTable specs={product.specs ?? []} />
 
       {product.description && (
         <section className="mt-14 max-w-2xl">

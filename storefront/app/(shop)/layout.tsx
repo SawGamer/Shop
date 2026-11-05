@@ -1,3 +1,4 @@
+import { CompareBar } from "@/components/compare";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 
@@ -15,6 +16,7 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
         {children}
       </main>
       <SiteFooter />
+      <CompareBar />
     </>
   );
 }

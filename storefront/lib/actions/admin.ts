@@ -193,6 +193,94 @@ export async function setStock(variantId: string, _prev: ActionState, fd: FormDa
   return ok("Stock updated.");
 }
 
+// ---- Specifications & deals ----
+
+type SpecInput = { group: string | null; label: string; value: string; filterable: boolean };
+
+/** The specs editor submits its rows as JSON in one hidden field. */
+function parseSpecs(raw: string): { value?: SpecInput[]; error?: string } {
+  let rows: unknown;
+  try {
+    rows = JSON.parse(raw || "[]");
+  } catch {
+    return { error: "The specifications could not be read. Reload the page and try again." };
+  }
+  if (!Array.isArray(rows)) return { error: "The specifications could not be read." };
+  if (rows.length > 60) return { error: "Up to 60 specifications per product." };
+  const out: SpecInput[] = [];
+  const seen = new Set<string>();
+  for (const [i, r] of rows.entries()) {
+    const row = r as Record<string, unknown>;
+    const label = String(row.label ?? "").trim();
+    const value = String(row.value ?? "").trim();
+    const group = String(row.group ?? "").trim();
+    if (!label && !value) continue; // ignore empty rows
+    if (!label || !value) return { error: `Row ${i + 1}: enter both a label and a value.` };
+    if (label.length > 80 || value.length > 200 || group.length > 60) return { error: `Row ${i + 1} is too long.` };
+    const key = label.toLowerCase();
+    if (seen.has(key)) return { error: `“${label}” is listed twice; each label can be used once.` };
+    seen.add(key);
+    out.push({ group: group || null, label, value, filterable: row.filterable === true });
+  }
+  return { value: out };
+}
+
+export async function saveSpecs(productId: string, _prev: ActionState, fd: FormData): Promise<ActionState> {
+  const parsed = parseSpecs(str(fd, "specs"));
+  if (!parsed.value) return fail(parsed.error ?? "Check the specifications.");
+  try {
+    await assertAdmin();
+    await api<AdminProduct>(`/api/v1/admin/products/${productId}/specs`, {
+      method: "PUT",
+      body: { specs: parsed.value },
+    });
+  } catch (e) {
+    return toActionState(e, "We couldn't save the specifications.");
+  }
+  catalogChanged();
+  refresh();
+  return ok("Specifications saved.");
+}
+
+export async function saveDeal(productId: string, _prev: ActionState, fd: FormData): Promise<ActionState> {
+  const percentOff = Number(str(fd, "percentOff"));
+  const startsAt = str(fd, "startsAt");
+  const endsAt = str(fd, "endsAt");
+  const errors: Record<string, string> = {};
+  if (!Number.isInteger(percentOff) || percentOff < 1 || percentOff > 90) errors.percentOff = "Enter 1 to 90";
+  const start = Date.parse(startsAt);
+  const end = Date.parse(endsAt);
+  if (!Number.isFinite(start)) errors.startsAt = "Choose a start";
+  if (!Number.isFinite(end)) errors.endsAt = "Choose an end";
+  else if (end <= Date.now()) errors.endsAt = "Must be in the future";
+  else if (Number.isFinite(start) && end <= start) errors.endsAt = "Must be after the start";
+  if (Object.keys(errors).length) return fail("Check the deal.", errors);
+  try {
+    await assertAdmin();
+    await api<AdminProduct>(`/api/v1/admin/products/${productId}/deal`, {
+      method: "PUT",
+      body: { percentOff, startsAt: new Date(start).toISOString(), endsAt: new Date(end).toISOString() },
+    });
+  } catch (e) {
+    return toActionState(e, "We couldn't save the deal.");
+  }
+  catalogChanged();
+  refresh();
+  return ok("Deal saved.");
+}
+
+export async function removeDeal(productId: string, _prev: ActionState): Promise<ActionState> {
+  try {
+    await assertAdmin();
+    await api<AdminProduct>(`/api/v1/admin/products/${productId}/deal`, { method: "DELETE" });
+  } catch (e) {
+    return toActionState(e, "We couldn't remove the deal.");
+  }
+  catalogChanged();
+  refresh();
+  return ok("Deal removed.");
+}
+
 // ---- Images ----
 
 export async function uploadImage(productId: string, _prev: ActionState, fd: FormData): Promise<ActionState> {

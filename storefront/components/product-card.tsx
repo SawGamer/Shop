@@ -5,8 +5,15 @@ import { formatMoney } from "@/lib/money";
 import { getShop } from "@/lib/shop";
 import type { CardVariant } from "@/lib/themes/types";
 import type { ProductSummary } from "@/lib/types";
+import { CompareToggle } from "./compare";
+import { DealCountdown } from "./deal-countdown";
 import { QuickAdd } from "./quick-add";
 import { Price, ProductImage, SaleSticker } from "./ui";
+
+function DealLine({ product, className }: { product: ProductSummary; className?: string }) {
+  if (!product.dealEndsAt) return null;
+  return <DealCountdown endsAt={product.dealEndsAt} tone="strong" className={className} />;
+}
 
 function SoldOut({ className }: { className?: string }) {
   return (
@@ -34,6 +41,7 @@ function BoxCard({ product }: { product: ProductSummary }) {
           {product.name}
         </h3>
         <Price price={product.price} compareAt={product.compareAtPrice} className="mt-1 text-sm" />
+        <DealLine product={product} className="mt-1" />
       </div>
     </Link>
   );
@@ -61,15 +69,31 @@ function TechCard({ product }: { product: ProductSummary }) {
           name={product.name}
           className="transition-transform duration-300 group-hover:scale-[1.04]"
         />
-        {save && (
-          <span className="absolute left-2 top-2 rounded-full bg-sticker px-2 py-0.5 text-xs font-bold text-ink">
-            Save {save}
+        {product.dealEndsAt ? (
+          <span className="absolute left-2 top-2 rounded-full bg-signal px-2 py-0.5 text-xs font-bold text-white">
+            Deal{save ? ` · Save ${save}` : ""}
           </span>
+        ) : (
+          save && (
+            <span className="absolute left-2 top-2 rounded-full bg-sticker px-2 py-0.5 text-xs font-bold text-ink">
+              Save {save}
+            </span>
+          )
         )}
         {!product.inStock && <SoldOut className="absolute bottom-2 left-2" />}
       </div>
       <p className="mt-3 text-xs font-semibold uppercase tracking-wider text-ink-faint">{product.brand.name}</p>
       <h3 className="mt-0.5 font-semibold leading-snug group-hover:text-cobalt">{product.name}</h3>
+      {(product.highlights?.length ?? 0) > 0 && (
+        <ul className="mt-1.5 space-y-0.5 text-xs text-ink-soft" aria-label="Key specifications">
+          {product.highlights!.slice(0, 3).map((h) => (
+            <li key={h} className="flex gap-1.5">
+              <span aria-hidden className="mt-[0.4rem] size-1 shrink-0 rounded-full bg-ink-faint" />
+              {h}
+            </li>
+          ))}
+        </ul>
+      )}
       {sizes.length > 0 && (
         <ul className="mt-2 flex flex-wrap gap-1" aria-label="Capacities">
           {sizes.slice(0, 3).map((s) => (
@@ -86,6 +110,7 @@ function TechCard({ product }: { product: ProductSummary }) {
         from={sizes.length > 1}
         className="mt-auto pt-3 text-base"
       />
+      <DealLine product={product} className="mt-1" />
     </Link>
   );
 }
@@ -106,6 +131,7 @@ function MarketCard({ product }: { product: ProductSummary }) {
         </div>
         <h3 className="mt-2 line-clamp-2 text-sm font-bold leading-snug group-hover:underline">{product.name}</h3>
         <p className="text-xs text-ink-faint">{pack ?? product.brand.name}</p>
+        <DealLine product={product} className="mt-1" />
       </Link>
       <div className="mt-auto flex items-end justify-between gap-2 pt-2">
         <Price price={product.price} compareAt={product.compareAtPrice} className="flex-col !gap-0 text-sm" />
@@ -160,6 +186,7 @@ function PortraitCard({ product }: { product: ProductSummary }) {
         <Swatches colors={product.colors} max={4} />
       </div>
       <Price price={product.price} compareAt={product.compareAtPrice} from={product.sizes.length > 1} className="mt-2 text-sm" />
+      <DealLine product={product} className="mt-1" />
     </Link>
   );
 }
@@ -188,6 +215,7 @@ function BoutiqueCard({ product }: { product: ProductSummary }) {
         <Swatches colors={product.colors} max={5} size="size-3" />
       </div>
       <Price price={product.price} compareAt={product.compareAtPrice} className="mt-1.5 justify-center text-sm" />
+      <DealLine product={product} className="mt-1 justify-center" />
     </Link>
   );
 }
@@ -208,19 +236,40 @@ const GRID: Record<CardVariant, string> = {
   boutique: "grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 lg:grid-cols-4",
 };
 
-export function ProductCard({ product, variant = "box" }: { product: ProductSummary; variant?: CardVariant }) {
+export function ProductCard({
+  product,
+  variant = "box",
+  compare = false,
+}: {
+  product: ProductSummary;
+  variant?: CardVariant;
+  /** Show a "Compare" toggle over the card's image. */
+  compare?: boolean;
+}) {
   const Card = CARDS[variant];
-  return <Card product={product} />;
+  if (!compare) return <Card product={product} />;
+  return (
+    <div className="relative h-full">
+      <Card product={product} />
+      <CompareToggle
+        slug={product.slug}
+        name={product.name}
+        imageUrl={product.imageUrl}
+        className={variant === "tech" ? "absolute right-5 top-5 z-10" : "absolute right-2 top-2 z-10"}
+      />
+    </div>
+  );
 }
 
 /** Product grid in the active design's card style. */
 export async function ProductGrid({ products, variant }: { products: ProductSummary[]; variant?: CardVariant }) {
-  const card = variant ?? (await getShop()).theme.layout.card;
+  const { layout } = (await getShop()).theme;
+  const card = variant ?? layout.card;
   return (
     <ul className={GRID[card]}>
       {products.map((p) => (
         <li key={p.id}>
-          <ProductCard product={p} variant={card} />
+          <ProductCard product={p} variant={card} compare={layout.compareOnCards} />
         </li>
       ))}
     </ul>

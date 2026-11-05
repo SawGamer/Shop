@@ -39,5 +39,5 @@ export const footwear: Theme = {
     metaDescription: "Running shoes, sneakers and boots.",
     announcement: null,
   },
-  layout: { header: "classic", card: "box", sizeOptions: "grid", colorOptions: "chips", buyBox: "label" },
+  layout: { header: "classic", card: "box", sizeOptions: "grid", colorOptions: "chips", buyBox: "label", megaMenu: false, compareOnCards: false },
 };

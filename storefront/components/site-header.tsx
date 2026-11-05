@@ -5,12 +5,13 @@ import { getCartSafe, getCategories } from "@/lib/data";
 import { logout } from "@/lib/actions/auth";
 import { getShop } from "@/lib/shop";
 import type { HeaderVariant } from "@/lib/themes/types";
+import { MegaMenu } from "./mega-menu";
 import { Container } from "./ui";
 import type { Category, User } from "@/lib/types";
 
 async function loadNav(): Promise<Category[]> {
   try {
-    return (await getCategories()).slice(0, 6);
+    return await getCategories();
   } catch {
     return [];
   }
@@ -196,14 +197,29 @@ export async function SiteHeader() {
         </form>
       </Container>
 
-      {nav.length > 0 && (
+      {nav.length > 0 && theme.layout.megaMenu && (
+        <div className={s.nav}>
+          <Container>
+            <MegaMenu
+              categories={nav.slice(0, 8)}
+              tone={theme.layout.header === "tech" || theme.layout.header === "market" ? "dark" : "light"}
+              extras={[
+                { label: "Deals of the day", href: "/search?deal=true&sort=deal_ending", tone: "sale" },
+                { label: "New in", href: "/search?sort=newest" },
+              ]}
+            />
+          </Container>
+        </div>
+      )}
+
+      {nav.length > 0 && !theme.layout.megaMenu && (
         <div className={s.nav}>
           <Container>
             <nav
               aria-label="Categories"
               className={clsx("-mx-1 flex gap-1 overflow-x-auto py-1 pb-2", s.centered && "md:justify-center")}
             >
-              {nav.map((c) => (
+              {nav.slice(0, 6).map((c) => (
                 <Link key={c.id} href={`/c/${c.slug}`} className={clsx("shrink-0 rounded-control px-2.5 py-1.5", s.navLink)}>
                   {c.name}
                 </Link>

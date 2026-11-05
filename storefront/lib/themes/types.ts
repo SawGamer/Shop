@@ -67,5 +67,9 @@ export type Theme = {
     colorOptions: "chips" | "swatches";
     /** Product page buy box: the bordered "box label" or a soft card. */
     buyBox: "label" | "card";
+    /** Department mega-menu instead of the simple category strip (big catalogues). */
+    megaMenu: boolean;
+    /** Show "Compare" toggles on product cards (the product page always has one). */
+    compareOnCards: boolean;
   };
 };

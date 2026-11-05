@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { DealCountdown } from "@/components/deal-countdown";
+import { ProductGrid } from "@/components/product-card";
 import { Container, Price, ProductImage } from "@/components/ui";
 import { compareSizes } from "@/lib/colors";
 import { EmptyCatalog, ProductSection } from "./sections";
@@ -87,6 +89,33 @@ export function ElectronicsHome({ data, theme }: HomeProps) {
         </Container>
       </section>
 
+      {data.deals.length > 0 && (
+        <section aria-labelledby="deals-title" className="bg-[color-mix(in_srgb,var(--color-signal)_7%,var(--color-paper))] py-10">
+          <Container>
+            <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-signal">Limited time</p>
+                <h2 id="deals-title" className="headline mt-1 text-3xl">
+                  Deals of the day
+                </h2>
+                {data.deals[0]?.dealEndsAt && (
+                  <DealCountdown
+                    endsAt={data.deals[0].dealEndsAt}
+                    label="Next deal ends in"
+                    tone="strong"
+                    className="mt-2 text-sm"
+                  />
+                )}
+              </div>
+              <Link href="/search?deal=true&sort=deal_ending" className="text-sm font-semibold text-cobalt hover:underline">
+                All deals
+              </Link>
+            </div>
+            <ProductGrid products={data.deals.slice(0, 4)} />
+          </Container>
+        </section>
+      )}
+
       {data.categories.length > 0 && (
         <Container className="mt-12">
           <h2 className="headline text-2xl">{copy.categoriesTitle}</h2>
@@ -107,7 +136,9 @@ export function ElectronicsHome({ data, theme }: HomeProps) {
       )}
 
       <ProductSection title={copy.newTitle} link={copy.newLink} href="/search?sort=newest" products={rest.slice(0, 8)} />
-      <ProductSection title={copy.saleTitle} link={copy.saleLink} href="/search?onSale=true" products={data.onSale.slice(0, 4)} />
+      {data.deals.length === 0 && (
+        <ProductSection title={copy.saleTitle} link={copy.saleLink} href="/search?onSale=true" products={data.onSale.slice(0, 4)} />
+      )}
       {data.latest.length === 0 && <EmptyCatalog text={copy.emptyCatalog} />}
     </>
   );

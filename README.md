@@ -57,6 +57,16 @@ SHOP_DEMO_CATALOG=grocery docker compose up --build
 
 The catalogs are `footwear` (the default), `electronics`, `grocery`, `home` and `beauty`; see [docs/demo-catalogs.md](docs/demo-catalogs.md).
 
+### Electronics store tools
+
+The electronics design adds the tools of a big electronics retailer:
+
+- **Mega-menu** across all departments (keyboard accessible; drill-down on phones).
+- **Specification tables** on product pages, edited per product in the admin.
+- **Spec filters** in search (RAM, screen size, battery…), with live counts that keep working while you filter.
+- **Compare** up to four products side by side, with a "show only differences" switch.
+- **Deals of the day:** percentage discounts with start and end time and a live countdown. The deal price applies in search, cart and checkout, and search entries refresh automatically when a deal starts or ends.
+
 ## Quick start
 
 Requirements: Docker with Compose v2.

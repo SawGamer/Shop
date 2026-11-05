@@ -39,5 +39,5 @@ export const home: Theme = {
     metaDescription: "Furniture, lighting and decor in natural materials.",
     announcement: null,
   },
-  layout: { header: "editorial", card: "portrait", sizeOptions: "chips", colorOptions: "swatches", buyBox: "card" },
+  layout: { header: "editorial", card: "portrait", sizeOptions: "chips", colorOptions: "swatches", buyBox: "card", megaMenu: false, compareOnCards: true },
 };

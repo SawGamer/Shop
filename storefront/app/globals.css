@@ -303,3 +303,8 @@
 [data-theme] {
   font-family: var(--font-sans);
 }
+
+/* /compare: "Show only differences" hides rows where every product has the same value. */
+.compare-only-diff tr.compare-row[data-same] {
+  display: none;
+}

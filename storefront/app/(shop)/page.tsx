@@ -22,12 +22,13 @@ const LAYOUTS: Record<ThemeId, (props: HomeProps) => React.ReactNode> = {
 async function loadHome(): Promise<HomeData | null> {
   try {
     const base = parseSearchParams({});
-    const [categories, latest, onSale] = await Promise.all([
+    const [categories, latest, onSale, deals] = await Promise.all([
       getCategories(),
       searchProducts({ ...base, sort: "newest" }, 12),
       searchProducts({ ...base, onSale: true, inStock: true, sort: "newest" }, 6),
+      searchProducts({ ...base, deal: true, sort: "deal_ending" }, 8).catch(() => null),
     ]);
-    return { categories, latest: latest.items, onSale: onSale.items };
+    return { categories, latest: latest.items, onSale: onSale.items, deals: deals?.items ?? [] };
   } catch {
     return null;
   }
@@ -41,7 +42,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <Layout data={data ?? { categories: [], latest: [], onSale: [] }} theme={theme} settings={settings} />
+      <Layout data={data ?? { categories: [], latest: [], onSale: [], deals: [] }} theme={theme} settings={settings} />
       {!data && (
         <Container className="mt-10">
           <ServiceDown what="the catalog" />

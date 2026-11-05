@@ -18,7 +18,7 @@ Principles:
 - The headless platform: Spring Boot API, Next.js storefront, admin, Stripe, search, carts, orders, CI and Docker.
 - Five genre designs, an admin Design page and a demo catalog per genre.
 
-## Phase 1 — Big electronics store tools
+## Phase 1 — Big electronics store tools (done)
 
 | Feature | What the customer gets | Backend | Storefront |
 |---|---|---|---|
@@ -28,7 +28,7 @@ Principles:
 | Deals of the day | time-limited discounts with a live countdown | `product_deals` (percent off, start, end); deal price applied in cart and checkout; search refreshed when deals start and end | deals section with countdowns; deal badge; deal editor in admin |
 | Mega-menu | browse all departments from the header | none (uses the category tree) | multi-column department menu on desktop, drill-down on mobile |
 
-Demo: specs for all 12 electronics products and 2–3 running deals.
+Demo: specs for all 12 electronics products and 3 running deals. Verified in a browser against the real API and covered by backend integration tests.
 
 ## Phase 2 — Grocery delivery and pickup
 

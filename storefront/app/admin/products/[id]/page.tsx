@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AdminTitle, Panel } from "@/components/admin/bits";
+import { DealEditor } from "@/components/admin/deal-editor";
 import { ImageManager } from "@/components/admin/image-manager";
 import { ProductForm } from "@/components/admin/product-form";
+import { SpecEditor } from "@/components/admin/spec-editor";
 import { VariantEditor } from "@/components/admin/variant-editor";
 import { ActionForm, SubmitButton } from "@/components/forms";
 import { Notice } from "@/components/ui";
@@ -65,6 +67,18 @@ export default async function EditProductPage({ params, searchParams }: Props) {
 
         <Panel title="Images">
           <ImageManager productId={product.id} images={product.images} />
+        </Panel>
+
+        <Panel title="Specifications">
+          <SpecEditor productId={product.id} specs={product.specs ?? []} />
+        </Panel>
+
+        <Panel title="Deal of the day">
+          <p className="mb-3 text-sm text-ink-soft">
+            A time-limited discount on every variant. While it runs, the shop shows the reduced price with the regular
+            price struck through and a countdown.
+          </p>
+          <DealEditor productId={product.id} deal={product.deal ?? null} />
         </Panel>
 
         {product.status !== "ARCHIVED" && (

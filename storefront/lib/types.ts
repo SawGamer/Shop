@@ -51,6 +51,20 @@ export type Variant = {
   inStock: boolean;
 };
 
+/** A product specification row (docs/api.md, Phase 1). */
+export type Spec = {
+  key: string;
+  group: string | null;
+  label: string;
+  value: string;
+  filterable: boolean;
+};
+
+/** A time-limited discount. Public products only carry it while it runs. */
+export type Deal = { percentOff: number; startsAt: string; endsAt: string };
+
+export type SpecFacet = { key: string; label: string; values: FacetValue[] };
+
 export type ProductSummary = {
   id: string;
   slug: string;
@@ -62,6 +76,10 @@ export type ProductSummary = {
   inStock: boolean;
   sizes: string[];
   colors: string[];
+  /** Set only while a deal runs. Older APIs may omit it. */
+  dealEndsAt?: string | null;
+  /** Up to 3 short spec lines like "8 GB RAM". */
+  highlights?: string[];
 };
 
 export type ProductDetail = {
@@ -81,6 +99,9 @@ export type ProductDetail = {
   status: ProductStatus;
   createdAt: string;
   updatedAt: string;
+  specs?: Spec[];
+  /** Public: only while running. Admin: also when scheduled or ended. */
+  deal?: Deal | null;
 };
 
 export type FacetValue = { value: string; label: string; count: number };
@@ -99,6 +120,7 @@ export type SearchResponse = Page<ProductSummary> & {
     category: FacetValue[];
     size: FacetValue[];
     color: FacetValue[];
+    specs?: SpecFacet[];
   };
 };
 
