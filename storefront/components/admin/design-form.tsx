@@ -69,7 +69,7 @@ export function DesignForm({ settings, options }: { settings: ShopSettings; opti
             Changes the storefront&apos;s colours, fonts, home page, product cards and option labels. Products and
             orders stay as they are.
           </p>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {options.map((o) => {
               const selected = theme === o.id;
               return (

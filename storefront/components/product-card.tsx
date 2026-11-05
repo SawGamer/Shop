@@ -220,12 +220,106 @@ function BoutiqueCard({ product }: { product: ProductSummary }) {
   );
 }
 
+/** Sports: crisp white tile, condensed name, colour dots and an orange rule on hover. */
+function SportCard({ product }: { product: ProductSummary }) {
+  const sizes = [...product.sizes].sort(compareSizes);
+  return (
+    <Link
+      href={`/p/${product.slug}`}
+      className="group flex h-full flex-col border-b-4 border-transparent bg-white transition-colors hover:border-cobalt"
+    >
+      <div className="relative aspect-[4/5] overflow-hidden bg-cloud">
+        <ProductImage
+          src={product.imageUrl}
+          alt={product.name}
+          name={product.name}
+          className="transition-transform duration-300 group-hover:scale-[1.04]"
+        />
+        <SaleSticker price={product.price} compareAt={product.compareAtPrice} className="absolute left-0 top-3 !rounded-none px-2.5 text-base" />
+        {!product.inStock && <SoldOut className="absolute bottom-2 left-2" />}
+      </div>
+      <div className="flex flex-1 flex-col p-3">
+        <p className="text-sm text-ink-faint">{product.brand.name}</p>
+        <h3 className="headline mt-0.5 text-[1.35rem] leading-[1.1]">{product.name}</h3>
+        <div className="mt-2 flex items-center justify-between gap-2">
+          <Swatches colors={product.colors} max={4} size="size-3" />
+          {sizes.length > 1 && <span className="tabular text-xs text-ink-faint">{sizes.length} sizes</span>}
+        </div>
+        <Price price={product.price} compareAt={product.compareAtPrice} from={sizes.length > 1} className="mt-auto pt-3 text-base" />
+        <DealLine product={product} className="mt-1" />
+      </div>
+    </Link>
+  );
+}
+
+/** Books: the cover as an object (spine shadow), title, publisher, format chips. */
+function CoverCard({ product }: { product: ProductSummary }) {
+  const formats = [...product.sizes].sort(compareSizes);
+  return (
+    <Link href={`/p/${product.slug}`} className="group flex h-full flex-col">
+      <div className="relative bg-cloud px-5 pb-5 pt-6">
+        <div className="relative aspect-[3/4] overflow-hidden rounded-r-[3px] rounded-l-[1px] shadow-[inset_6px_0_6px_-4px_rgba(0,0,0,0.28),4px_6px_14px_-4px_rgba(27,36,56,0.45)] transition-transform duration-300 group-hover:-translate-y-1">
+          <ProductImage src={product.imageUrl} alt={product.name} name={product.name} />
+          <span aria-hidden className="absolute inset-y-0 left-1.5 w-px bg-black/20" />
+        </div>
+        <SaleSticker price={product.price} compareAt={product.compareAtPrice} className="absolute right-2 top-2 rounded-full px-2" />
+        {!product.inStock && <SoldOut className="absolute bottom-2 left-2" />}
+      </div>
+      <h3 className="headline mt-3 text-[1.15rem] leading-snug group-hover:text-cobalt">{product.name}</h3>
+      <p className="text-sm text-ink-soft">{product.brand.name}</p>
+      {formats.length > 0 && (
+        <ul className="mt-2 flex flex-wrap gap-1" aria-label="Formats">
+          {formats.slice(0, 3).map((f) => (
+            <li key={f} className="rounded-tag border border-mist bg-white px-1.5 py-0.5 text-xs text-ink-soft">
+              {f}
+            </li>
+          ))}
+        </ul>
+      )}
+      <Price price={product.price} compareAt={product.compareAtPrice} from={formats.length > 1} className="mt-auto pt-3 text-base" />
+      <DealLine product={product} className="mt-1" />
+    </Link>
+  );
+}
+
+/** Gourmet: a big rounded photo, serif name, portions and flavour dots. */
+function TreatCard({ product }: { product: ProductSummary }) {
+  const portions = [...product.sizes].sort(compareSizes);
+  return (
+    <Link href={`/p/${product.slug}`} className="group flex h-full flex-col">
+      <div className="relative aspect-[4/5] overflow-hidden rounded-[var(--radius-tag)] bg-cloud">
+        <ProductImage
+          src={product.imageUrl}
+          alt={product.name}
+          name={product.name}
+          className="transition-transform duration-500 group-hover:scale-[1.05]"
+        />
+        <SaleSticker price={product.price} compareAt={product.compareAtPrice} className="absolute left-3 top-3 rounded-full px-3" />
+        {!product.inStock && <SoldOut className="absolute bottom-3 left-3 rounded-full px-3" />}
+      </div>
+      <div className="mt-3 flex items-start justify-between gap-3">
+        <h3 className="headline text-[1.5rem] leading-[1.1] group-hover:text-cobalt">{product.name}</h3>
+        <Swatches colors={product.colors} max={4} size="size-3" />
+      </div>
+      <p className="mt-0.5 text-sm text-ink-soft">{product.brand.name}</p>
+      {portions.length > 1 && (
+        <p className="mt-1 text-xs text-ink-faint">{portions.slice(0, 3).join(" · ")}{portions.length > 3 ? " …" : ""}</p>
+      )}
+      <Price price={product.price} compareAt={product.compareAtPrice} from={portions.length > 1} className="mt-auto pt-2 text-base" />
+      <DealLine product={product} className="mt-1" />
+    </Link>
+  );
+}
+
 const CARDS: Record<CardVariant, (p: { product: ProductSummary }) => React.ReactNode> = {
   box: BoxCard,
   tech: TechCard,
   market: MarketCard,
   portrait: PortraitCard,
   boutique: BoutiqueCard,
+  sport: SportCard,
+  cover: CoverCard,
+  treat: TreatCard,
 };
 
 const GRID: Record<CardVariant, string> = {
@@ -234,6 +328,9 @@ const GRID: Record<CardVariant, string> = {
   market: "grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6",
   portrait: "grid grid-cols-2 gap-x-5 gap-y-12 sm:gap-x-8 lg:grid-cols-3",
   boutique: "grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 lg:grid-cols-4",
+  sport: "grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 sm:gap-4",
+  cover: "grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5",
+  treat: "grid grid-cols-2 gap-x-4 gap-y-9 sm:grid-cols-3 lg:grid-cols-4 sm:gap-x-6",
 };
 
 export function ProductCard({

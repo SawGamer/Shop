@@ -95,6 +95,30 @@ const STYLE: Record<
     sale: "font-semibold text-cobalt hover:text-cobalt-deep",
     centered: true,
   },
+  sport: {
+    bar: "border-b-4 border-sticker bg-ink text-white",
+    wordmark: "headline text-[2.1rem] leading-none",
+    search: "field max-w-xl border-white/15 bg-white/10 text-white placeholder:text-white/55 focus:bg-white focus:text-ink",
+    link: "text-white/85 hover:bg-white/10 hover:text-white",
+    cart: "bg-sticker text-ink hover:brightness-95",
+    badge: "bg-ink text-sticker",
+    nav: "text-[0.95rem] border-t border-white/10",
+    navLink: "font-semibold text-white/75 hover:bg-white/10 hover:text-white",
+    sale: "font-bold text-sticker hover:bg-white/10",
+    centered: false,
+  },
+  bookshop: {
+    bar: "border-b-2 border-ink bg-white",
+    wordmark: "headline text-[2rem] leading-none",
+    search: "field max-w-md bg-paper",
+    link: "hover:bg-cloud",
+    cart: "bg-cobalt text-white hover:bg-cobalt-deep",
+    badge: "bg-white text-cobalt",
+    nav: "text-sm border-t border-mist",
+    navLink: "font-medium text-ink-soft hover:text-cobalt hover:underline underline-offset-4",
+    sale: "font-semibold text-cobalt hover:text-cobalt-deep",
+    centered: false,
+  },
 };
 
 function Wordmark({ name, logoUrl, className }: { name: string; logoUrl: string | null; className: string }) {
@@ -155,7 +179,7 @@ export async function SiteHeader() {
   const local = settings.fulfillmentMode === "LOCAL";
   const postcode = local ? await getPostcodeCookie() : null;
   const zone = postcode ? await getZone(postcode).catch(() => null) : null;
-  const dark = theme.layout.header === "tech" || theme.layout.header === "market";
+  const dark = theme.layout.header === "tech" || theme.layout.header === "market" || theme.layout.header === "sport";
   const { searchLabel, searchPlaceholder } = theme.labels;
 
   const desktopSearch = (

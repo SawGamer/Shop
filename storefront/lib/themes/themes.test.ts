@@ -36,6 +36,13 @@ describe("theme registry", () => {
     expect([THEMES.grocery.labels.size, THEMES.grocery.labels.color]).toEqual(["Pack size", "Variety"]);
     expect([THEMES.home.labels.size, THEMES.home.labels.color]).toEqual(["Size", "Finish"]);
     expect([THEMES.beauty.labels.size, THEMES.beauty.labels.color]).toEqual(["Size", "Shade"]);
+    expect([THEMES.sports.labels.size, THEMES.sports.labels.color]).toEqual(["Size", "Colour"]);
+    expect([THEMES.books.labels.size, THEMES.books.labels.color]).toEqual(["Format", "Language"]);
+    expect([THEMES.gourmet.labels.size, THEMES.gourmet.labels.color]).toEqual(["Portion", "Flavour"]);
+  });
+
+  it("orders portions and formats", () => {
+    expect(["Box of 25", "Box of 9", "Box of 16"].sort(compareSizes)).toEqual(["Box of 9", "Box of 16", "Box of 25"]);
   });
 
   it("falls back to footwear for unknown or missing ids", () => {
@@ -71,6 +78,12 @@ describe("demo colour names", () => {
     // footwear
     "Sky Blue", "Nude", "Grey", "Royal Blue", "Black/Volt", "Tobacco", "Olive", "Olive/Brown", "Blue", "Red/Black",
     "Yellow/Black", "Pink/Purple", "Wheat Gold", "Emerald",
+    // sports & outdoor
+    "Forest", "Ember", "Orange", "Olive", "Navy", "Moss", "Brown", "Grey", "Black", "Red", "Neon", "Teal", "White",
+    "Matt Black", "Purple", "Steel", "Lime", "Silver",
+    // gourmet (flavours)
+    "Dark 70%", "Milk 45%", "Sea salt", "Margherita", "Salame", "Funghi", "Raspberry", "Pistachio", "Chilli", "Mixed",
+    "Assorted", "Classic", "Dark only", "Plain",
   ];
   it.each(names)("has a swatch for %s", (name) => {
     expect(hasSwatch(name)).toBe(true);

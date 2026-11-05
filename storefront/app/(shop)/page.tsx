@@ -1,9 +1,12 @@
 import { connection } from "next/server";
 import { BeautyHome } from "@/components/home/beauty-home";
+import { BooksHome } from "@/components/home/books-home";
 import { ElectronicsHome } from "@/components/home/electronics-home";
 import { FootwearHome } from "@/components/home/footwear-home";
+import { GourmetHome } from "@/components/home/gourmet-home";
 import { GroceryHome } from "@/components/home/grocery-home";
 import { HomeHome } from "@/components/home/home-home";
+import { SportsHome } from "@/components/home/sports-home";
 import type { HomeData, HomeProps } from "@/components/home/types";
 import { Container, Notice, ServiceDown } from "@/components/ui";
 import { getCategories, searchProducts } from "@/lib/data";
@@ -17,6 +20,9 @@ const LAYOUTS: Record<ThemeId, (props: HomeProps) => React.ReactNode> = {
   grocery: GroceryHome,
   home: HomeHome,
   beauty: BeautyHome,
+  sports: SportsHome,
+  books: BooksHome,
+  gourmet: GourmetHome,
 };
 
 async function loadHome(): Promise<HomeData | null> {

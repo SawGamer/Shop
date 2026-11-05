@@ -1,0 +1,43 @@
+import type { Theme } from "./types";
+
+/** Library paper, ink blue and burgundy; a book serif, cover-first cards and shelf rows. */
+export const books: Theme = {
+  id: "books",
+  name: "Books & media",
+  description: "Library paper, ink blue and burgundy, a book serif, cover-first cards and shelves by genre.",
+  themeColor: "#1b2438",
+  preview: { paper: "#f5f2ec", ink: "#1b2438", accent: "#7d1d3a", highlight: "#e9c46a", font: '"Source Serif 4 Variable", serif', sample: "Read on" },
+  labels: {
+    size: "Format",
+    sizeShort: "Format",
+    color: "Language",
+    choose: "Choose a format",
+    noun: ["title", "titles"],
+    searchPlaceholder: "Search title, author or ISBN…",
+    searchLabel: "Search books",
+    allProducts: "All books",
+  },
+  copy: {
+    heroEyebrow: "On the front table",
+    heroTitle: "Your next book is on the shelf.",
+    heroSub: "Novels, non-fiction, cookbooks and picture books, in paperback, hardcover and e-book.",
+    primaryCta: "See the front table",
+    secondaryCta: "Browse all books",
+    categoriesTitle: "Browse the shelves",
+    newTitle: "New on the shelves",
+    newLink: "All new titles",
+    saleTitle: "Reduced titles",
+    saleLink: "All reduced titles",
+    emptyCatalog: "The shelves are empty. Add titles in the admin area to stock them.",
+    noResults: "No titles match",
+    noResultsHint: "Check the spelling, or try an author name or a genre like “thriller”.",
+    emptyCart: "Your basket has no books yet",
+    emptyCartHint: "Add a few titles and they will wait here while you keep browsing.",
+    firstOrder: "Pick your first book",
+    aboutProduct: "About this book",
+    footerLine: "An independent bookshop for readers of every age.",
+    metaDescription: "Books in paperback, hardcover and e-book: fiction, non-fiction, cookbooks and children's titles.",
+    announcement: "Free delivery on orders over €30 · E-books ready to read right after checkout",
+  },
+  layout: { header: "bookshop", card: "cover", sizeOptions: "chips", colorOptions: "chips", buyBox: "card", megaMenu: false, compareOnCards: false },
+};

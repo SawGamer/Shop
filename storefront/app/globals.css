@@ -299,6 +299,75 @@
   --radius-control: 999px;
 }
 
+[data-theme="sports"] {
+  --color-paper: #eff1ec;
+  --color-white: #ffffff;
+  --color-ink: #14181a;
+  --color-ink-soft: #485056;
+  --color-ink-faint: #727a80;
+  --color-mist: #d9ddd8;
+  --color-cloud: #e4e7e2;
+  --color-cobalt: #d44a0a;
+  --color-cobalt-deep: #a83a07;
+  --color-sticker: #c6f432;
+  --color-signal: #c8201e;
+  --color-moss: #2f7d3a;
+  --font-sans: "Barlow", ui-sans-serif, system-ui, sans-serif;
+  --display-font: "Barlow Condensed", "Barlow", ui-sans-serif, sans-serif;
+  --display-stretch: 100%;
+  --display-weight: 800;
+  --display-tracking: 0.005em;
+  --display-style: normal;
+  --radius-tag: 2px;
+  --radius-control: 4px;
+}
+
+[data-theme="books"] {
+  --color-paper: #f5f2ec;
+  --color-white: #fffefb;
+  --color-ink: #1b2438;
+  --color-ink-soft: #4a5368;
+  --color-ink-faint: #787f92;
+  --color-mist: #ddd8cd;
+  --color-cloud: #e9e5db;
+  --color-cobalt: #7d1d3a;
+  --color-cobalt-deep: #5e1429;
+  --color-sticker: #e9c46a;
+  --color-signal: #b3261e;
+  --color-moss: #3c6e4f;
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --display-font: "Source Serif 4 Variable", ui-serif, Georgia, serif;
+  --display-stretch: 100%;
+  --display-weight: 600;
+  --display-tracking: -0.012em;
+  --display-style: normal;
+  --radius-tag: 2px;
+  --radius-control: 4px;
+}
+
+[data-theme="gourmet"] {
+  --color-paper: #f7efe6;
+  --color-white: #fffaf4;
+  --color-ink: #3a2218;
+  --color-ink-soft: #684b3d;
+  --color-ink-faint: #94796a;
+  --color-mist: #e8d8c8;
+  --color-cloud: #f0e2d2;
+  --color-cobalt: #b3214f;
+  --color-cobalt-deep: #8e1a3f;
+  --color-sticker: #f2c46d;
+  --color-signal: #b3261e;
+  --color-moss: #5b7a3a;
+  --font-sans: "DM Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --display-font: "DM Serif Display", ui-serif, Georgia, serif;
+  --display-stretch: 100%;
+  --display-weight: 400;
+  --display-tracking: 0;
+  --display-style: normal;
+  --radius-tag: 22px;
+  --radius-control: 14px;
+}
+
 /* The body font follows the design (set on <html>, so nested design wrappers like /admin can reset it). */
 [data-theme] {
   font-family: var(--font-sans);
