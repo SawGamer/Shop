@@ -20,7 +20,25 @@ function pick(variants: Variant[], color: string | null, size: string | null, ha
  * The product's "box label": brand, name, price, colour, size grid and add to cart.
  * Sizes without stock in the chosen colour are disabled.
  */
-export function VariantPicker({ product }: { product: ProductDetail }) {
+export type PickerLabels = { size: string; sizeShort: string; color: string; choose: string };
+
+const DEFAULT_LABELS: PickerLabels = { size: "Size (EU)", sizeShort: "Size", color: "Colour", choose: "Choose a size" };
+
+export function VariantPicker({
+  product,
+  labels = DEFAULT_LABELS,
+  sizeOptions = "grid",
+  colorOptions = "chips",
+  buyBox = "label",
+}: {
+  product: ProductDetail;
+  labels?: PickerLabels;
+  sizeOptions?: "grid" | "chips";
+  colorOptions?: "chips" | "swatches";
+  buyBox?: "label" | "card";
+}) {
+  const boxed = buyBox === "label";
+  const rule = boxed ? "border-ink" : "border-mist";
   const colors = product.colors;
   const sizes = useMemo(() => [...product.sizes].sort(compareSizes), [product.sizes]);
   const hasColors = colors.length > 0;
@@ -50,16 +68,17 @@ export function VariantPicker({ product }: { product: ProductDetail }) {
 
   let stockHint: React.ReactNode = null;
   if (chosen) {
-    if (!chosen.inStock) stockHint = <span className="text-signal">Sold out{hasSizes ? " in this size" : ""}</span>;
+    if (!chosen.inStock)
+      stockHint = <span className="text-signal">Sold out{hasSizes ? ` in this ${labels.sizeShort.toLowerCase()}` : ""}</span>;
     else if (chosen.available <= 5) stockHint = <span className="text-signal">Only {chosen.available} left</span>;
     else stockHint = <span className="text-moss">In stock, ready to ship</span>;
   } else if (hasSizes) {
-    stockHint = <span className="text-ink-soft">Choose a size to see stock</span>;
+    stockHint = <span className="text-ink-soft">{labels.choose} to see stock</span>;
   }
 
   return (
-    <div className="rounded-tag border-2 border-ink bg-white">
-      <div className="border-b-2 border-ink px-5 py-4">
+    <div className={clsx("rounded-tag bg-white", boxed ? "border-2 border-ink" : "border border-mist shadow-sm")}>
+      <div className={clsx("px-5 py-4", boxed ? "border-b-2" : "border-b", rule)}>
         <p className="text-sm font-semibold text-ink-soft">{product.brand.name}</p>
         <h1 className="headline mt-1 text-[2.4rem] leading-[0.95] sm:text-5xl">{product.name}</h1>
         <div className="mt-3 flex items-center gap-3 text-lg">
@@ -74,12 +93,38 @@ export function VariantPicker({ product }: { product: ProductDetail }) {
         {hasColors && (
           <fieldset>
             <legend className="mb-2 text-sm font-semibold">
-              Colour: <span className="font-normal text-ink-soft">{color}</span>
+              {labels.color}: <span className="font-normal text-ink-soft">{color}</span>
             </legend>
             <div className="flex flex-wrap gap-2">
               {colors.map((c) => {
                 const sw = swatchFor(c);
                 const anyStock = product.variants.some((v) => v.color === c && v.inStock);
+                const select = () => {
+                  setColor(c);
+                  if (size && !product.variants.some((v) => v.color === c && v.size === size)) setSize(null);
+                };
+                if (colorOptions === "swatches" && sw) {
+                  return (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={select}
+                      aria-pressed={c === color}
+                      aria-label={`${c}${anyStock ? "" : ", sold out"}`}
+                      title={c}
+                      className={clsx(
+                        "relative size-10 rounded-full ring-1 ring-ink/20 ring-offset-2 ring-offset-white transition",
+                        c === color ? "ring-2 ring-ink" : "hover:ring-ink/60",
+                        !anyStock && "opacity-40",
+                      )}
+                      style={{ background: sw }}
+                    >
+                      {!anyStock && (
+                        <span aria-hidden className="absolute inset-0 m-auto h-px w-full rotate-45 bg-ink/60" />
+                      )}
+                    </button>
+                  );
+                }
                 return (
                   <button
                     key={c}
@@ -113,10 +158,10 @@ export function VariantPicker({ product }: { product: ProductDetail }) {
         {hasSizes && (
           <fieldset>
             <legend className="mb-2 flex w-full justify-between text-sm font-semibold">
-              <span>Size (EU)</span>
+              <span>{labels.size}</span>
               {size && <span className="font-normal text-ink-soft">Selected: {size}</span>}
             </legend>
-            <div className="grid grid-cols-5 gap-1.5 sm:grid-cols-6">
+            <div className={sizeOptions === "grid" ? "grid grid-cols-5 gap-1.5 sm:grid-cols-6" : "flex flex-wrap gap-2"}>
               {sizes.map((s) => {
                 const exists = sizeExists(s);
                 const available = sizeAvailable(s);
@@ -130,9 +175,11 @@ export function VariantPicker({ product }: { product: ProductDetail }) {
                       setQuantity(1);
                     }}
                     aria-pressed={s === size}
-                    aria-label={`Size ${s}${available ? "" : exists ? ", sold out" : ", not made in this colour"}`}
+                    aria-label={`${labels.sizeShort} ${s}${available ? "" : exists ? ", sold out" : `, not available in this ${labels.color.toLowerCase()}`}`}
                     className={clsx(
-                      "headline tabular h-14 rounded-tag border text-2xl transition-colors",
+                      sizeOptions === "grid"
+                        ? "headline tabular h-14 rounded-tag border text-2xl transition-colors"
+                        : "tabular h-11 rounded-control border px-4 text-sm font-semibold transition-colors",
                       s === size ? "border-ink bg-ink text-paper" : "border-ink/20 bg-white hover:border-ink hover:bg-sticker",
                       !available && "cursor-not-allowed border-transparent bg-cloud text-ink-faint line-through hover:border-transparent hover:bg-cloud",
                     )}
@@ -172,7 +219,7 @@ export function VariantPicker({ product }: { product: ProductDetail }) {
             pendingLabel="Adding…"
             disabled={!chosen || !chosen.inStock}
           >
-            {!chosen && hasSizes ? "Choose a size" : chosen && !chosen.inStock ? "Sold out" : "Add to cart"}
+            {!chosen && hasSizes ? labels.choose : chosen && !chosen.inStock ? "Sold out" : "Add to cart"}
           </SubmitButton>
         </div>
 
@@ -186,13 +233,13 @@ export function VariantPicker({ product }: { product: ProductDetail }) {
         </div>
       </form>
 
-      <dl className="tabular grid grid-cols-2 border-t-2 border-ink text-sm">
-        <div className="border-r border-ink/15 px-5 py-3">
+      <dl className={clsx("tabular grid grid-cols-2 text-sm", boxed ? "border-t-2" : "border-t", rule)}>
+        <div className={clsx("border-r px-5 py-3", boxed ? "border-ink/15" : "border-mist")}>
           <dt className="text-ink-faint">SKU</dt>
           <dd className="font-semibold">{chosen?.sku ?? "Choose options"}</dd>
         </div>
         <div className="px-5 py-3">
-          <dt className="text-ink-faint">{hasColors ? "Colour" : "Size"}</dt>
+          <dt className="text-ink-faint">{hasColors ? labels.color : labels.sizeShort}</dt>
           <dd className="font-semibold">{(hasColors ? color : size) ?? "–"}</dd>
         </div>
       </dl>

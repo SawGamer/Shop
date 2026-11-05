@@ -1,0 +1,43 @@
+import type { Theme } from "./types";
+
+/** Warm neutrals, editorial serif headings and generous whitespace. */
+export const home: Theme = {
+  id: "home",
+  name: "Home & furniture",
+  description: "Warm neutrals and an editorial serif, an image collage and tall portrait cards.",
+  themeColor: "#2a2521",
+  preview: { paper: "#f3eee6", ink: "#2a2521", accent: "#7a4f33", highlight: "#e9d3b0", font: '"Fraunces Variable", serif', sample: "Oak" },
+  labels: {
+    size: "Size",
+    sizeShort: "Size",
+    color: "Finish",
+    choose: "Choose a size",
+    noun: ["piece", "pieces"],
+    searchPlaceholder: "Search sofas, lamps, rugs…",
+    searchLabel: "Search the collection",
+    allProducts: "The full collection",
+  },
+  copy: {
+    heroEyebrow: "The new collection",
+    heroTitle: "Made to be lived with.",
+    heroSub: "Solid wood, natural linen and handmade ceramics for rooms that feel calm.",
+    primaryCta: "Explore the collection",
+    secondaryCta: "Shop by room",
+    categoriesTitle: "Shop by room",
+    newTitle: "New this season",
+    newLink: "View all new pieces",
+    saleTitle: "Quietly reduced",
+    saleLink: "View all offers",
+    emptyCatalog: "The collection is empty. Add products in the admin area to show them here.",
+    noResults: "Nothing in the collection matches",
+    noResultsHint: "Remove a filter or try a broader word, like “oak” or “lamp”.",
+    emptyCart: "Your basket is empty",
+    emptyCartHint: "Pieces you add will wait here while you look around.",
+    firstOrder: "Explore the collection",
+    aboutProduct: "Details",
+    footerLine: "Furniture and objects made from honest materials.",
+    metaDescription: "Furniture, lighting and decor in natural materials.",
+    announcement: null,
+  },
+  layout: { header: "editorial", card: "portrait", sizeOptions: "chips", colorOptions: "swatches", buyBox: "card" },
+};

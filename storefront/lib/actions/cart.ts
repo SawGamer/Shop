@@ -7,6 +7,7 @@ import { fail, ok, str, type ActionState } from "@/lib/action-state";
 import { toActionState } from "@/lib/action-errors";
 import { COOKIE_ACCESS } from "@/lib/config";
 import { syncCartCookie } from "@/lib/session";
+import { getProduct } from "@/lib/data";
 import type { Cart } from "@/lib/types";
 
 async function loggedIn(): Promise<boolean> {
@@ -81,4 +82,27 @@ export async function clearCart(): Promise<void> {
     // Ignore: the cart view reflects whatever the API returns next.
   }
   refresh();
+}
+
+/**
+ * One-tap "Add" from a product card (grocery design): adds one of the first in-stock variant.
+ * Cards only know the product, so the variant is picked here on the server.
+ */
+export async function quickAddToCart(slug: string, _prev: ActionState): Promise<ActionState> {
+  try {
+    const product = await getProduct(slug);
+    const variant = product?.variants.find((v) => v.inStock);
+    if (!variant) return fail("This one is sold out.");
+    const user = await loggedIn();
+    const { data, headers } = await apiRequest<Cart>("/api/v1/cart/items", {
+      method: "POST",
+      body: { variantId: variant.id, quantity: 1 },
+      cart: true,
+    });
+    await syncCartCookie(data, headers, user);
+  } catch (e) {
+    return toActionState(e, "We couldn't add that to your basket.");
+  }
+  refresh();
+  return ok("Added");
 }

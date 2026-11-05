@@ -1,0 +1,43 @@
+import type { Theme } from "./types";
+
+/** The original Z&A shoe shop: paper and navy ink, cobalt actions, sticker-yellow price tags. */
+export const footwear: Theme = {
+  id: "footwear",
+  name: "Footwear",
+  description: "Shoe-box labels: condensed athletic type, a size grid and yellow price stickers.",
+  themeColor: "#17203b",
+  preview: { paper: "#f2f3ef", ink: "#17203b", accent: "#2b3fd6", highlight: "#ffd23f", font: '"Archivo Variable", sans-serif', sample: "Aa 42" },
+  labels: {
+    size: "Size (EU)",
+    sizeShort: "Size",
+    color: "Colour",
+    choose: "Choose a size",
+    noun: ["pair", "pairs"],
+    searchPlaceholder: "Search by name, brand or style",
+    searchLabel: "Search shoes",
+    allProducts: "All shoes",
+  },
+  copy: {
+    heroEyebrow: "New season",
+    heroTitle: "Shoes in your size, ready to ship.",
+    heroSub: "Pick your EU size to see every pair we have in stock, or search by brand and style.",
+    primaryCta: "See new arrivals",
+    secondaryCta: "Browse all shoes",
+    categoriesTitle: "Shop by category",
+    newTitle: "New arrivals",
+    newLink: "See all new arrivals",
+    saleTitle: "On sale",
+    saleLink: "See everything on sale",
+    emptyCatalog: "The catalog is empty. Add products in the admin area to see them here.",
+    noResults: "No shoes match",
+    noResultsHint: "Remove a filter or try a broader search, like a brand name or “running”.",
+    emptyCart: "Your cart is empty",
+    emptyCartHint: "Pick a pair and your size, and it will wait here while you keep shopping.",
+    firstOrder: "Find your first pair",
+    aboutProduct: "About this shoe",
+    footerLine: "Shoes for running, walking and everyday wear.",
+    metaDescription: "Running shoes, sneakers and boots.",
+    announcement: null,
+  },
+  layout: { header: "classic", card: "box", sizeOptions: "grid", colorOptions: "chips", buyBox: "label" },
+};

@@ -15,8 +15,11 @@ import type {
   Order,
   ProductStatus,
   ProductUpsert,
+  ShopSettings,
+  ShopSettingsUpdate,
   VariantUpsert,
 } from "@/lib/types";
+import { isThemeId } from "@/lib/themes";
 
 const STATUSES: ProductStatus[] = ["DRAFT", "ACTIVE", "ARCHIVED"];
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
@@ -353,4 +356,68 @@ export async function reindexSearch(_prev: ActionState): Promise<ActionState> {
   }
   catalogChanged();
   return ok(`Search index rebuilt with ${indexed} products.`);
+}
+
+// ---- Shop design ----
+
+const MAX_LOGO_BYTES = 2 * 1024 * 1024;
+
+/** The storefront reads settings under the "shop" tag; expire it so the next navigation shows the change. */
+function shopChanged(): void {
+  updateTag("shop");
+  refresh();
+}
+
+export async function saveShopSettings(_prev: ActionState, fd: FormData): Promise<ActionState> {
+  const name = str(fd, "name");
+  const tagline = optStr(fd, "tagline");
+  const theme = str(fd, "theme");
+  const useDefaultAccent = fd.get("accentDefault") === "on";
+  const accent = str(fd, "accentColor").toLowerCase();
+
+  const errors: Record<string, string> = {};
+  if (!name) errors.name = "Enter the shop name";
+  else if (name.length > 80) errors.name = "Use at most 80 characters";
+  if (tagline && tagline.length > 160) errors.tagline = "Use at most 160 characters";
+  if (!isThemeId(theme)) errors.theme = "Choose a design";
+  if (!useDefaultAccent && !/^#[0-9a-f]{6}$/.test(accent)) errors.accentColor = "Pick a colour";
+  if (Object.keys(errors).length) return fail("Check the highlighted fields.", errors);
+
+  const body: ShopSettingsUpdate = { name, tagline, theme, accentColor: useDefaultAccent ? null : accent };
+  try {
+    await assertAdmin();
+    await api<ShopSettings>("/api/v1/admin/shop", { method: "PUT", body });
+  } catch (e) {
+    return toActionState(e, "We couldn't save the design.");
+  }
+  shopChanged();
+  return ok("Saved. The shop now uses this design.");
+}
+
+export async function uploadLogo(_prev: ActionState, fd: FormData): Promise<ActionState> {
+  const file = fd.get("file");
+  if (!(file instanceof File) || file.size === 0) return fail("Choose a logo to upload.", { file: "Required" });
+  if (!IMAGE_TYPES.has(file.type)) return fail("Upload a PNG, JPEG or GIF image.", { file: "Unsupported type" });
+  if (file.size > MAX_LOGO_BYTES) return fail("Logos can be up to 2 MB.", { file: "Too large" });
+  const body = new FormData();
+  body.append("file", file, file.name);
+  try {
+    await assertAdmin();
+    await api<ShopSettings>("/api/v1/admin/shop/logo", { method: "POST", formData: body });
+  } catch (e) {
+    return toActionState(e, "We couldn't upload the logo.");
+  }
+  shopChanged();
+  return ok("Logo uploaded.");
+}
+
+export async function removeLogo(_prev: ActionState): Promise<ActionState> {
+  try {
+    await assertAdmin();
+    await api<ShopSettings>("/api/v1/admin/shop/logo", { method: "DELETE" });
+  } catch (e) {
+    return toActionState(e, "We couldn't remove the logo.");
+  }
+  shopChanged();
+  return ok("Logo removed. The shop name is shown instead.");
 }

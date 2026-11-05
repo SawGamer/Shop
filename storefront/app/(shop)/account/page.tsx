@@ -8,6 +8,7 @@ import { isAdmin, requireUser } from "@/lib/auth";
 import { getMyOrders } from "@/lib/data";
 import { formatDate, pluralize } from "@/lib/format";
 import { formatMoney } from "@/lib/money";
+import { getShop } from "@/lib/shop";
 import type { OrderSummary, Page } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Your account" };
@@ -16,6 +17,7 @@ type Props = { searchParams: Promise<{ page?: string }> };
 
 export default async function AccountPage({ searchParams }: Props) {
   const user = await requireUser("/account");
+  const { theme } = await getShop();
   const pageNum = Math.max(1, Number.parseInt((await searchParams).page ?? "1", 10) || 1);
 
   let orders: Page<OrderSummary> | null = null;
@@ -79,7 +81,7 @@ export default async function AccountPage({ searchParams }: Props) {
           {!orders ? (
             <ServiceDown what="your orders" />
           ) : orders.items.length === 0 ? (
-            <EmptyState title="No orders yet" action={{ href: "/search", label: "Find your first pair" }}>
+            <EmptyState title="No orders yet" action={{ href: "/search", label: theme.copy.firstOrder }}>
               When you buy something, it shows up here with its delivery status.
             </EmptyState>
           ) : (

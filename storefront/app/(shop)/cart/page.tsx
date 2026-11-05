@@ -6,6 +6,7 @@ import { Container, EmptyState, PageTitle, ServiceDown } from "@/components/ui";
 import { clearCart } from "@/lib/actions/cart";
 import { getCartSafe } from "@/lib/data";
 import { pluralize } from "@/lib/format";
+import { getShop } from "@/lib/shop";
 
 export const metadata: Metadata = { title: "Cart" };
 
@@ -22,11 +23,12 @@ export default async function CartPage() {
   }
 
   if (cart.items.length === 0) {
+    const { theme } = await getShop();
     return (
       <Container className="py-10">
         <PageTitle>Your cart</PageTitle>
-        <EmptyState title="Your cart is empty" action={{ href: "/search", label: "Browse shoes" }}>
-          Pick a pair and your size, and it will wait here while you keep shopping.
+        <EmptyState title={theme.copy.emptyCart} action={{ href: "/search", label: `Browse ${theme.labels.allProducts.replace(/^All /, "").toLowerCase()}` }}>
+          {theme.copy.emptyCartHint}
         </EmptyState>
       </Container>
     );

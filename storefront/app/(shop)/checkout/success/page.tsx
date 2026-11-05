@@ -6,6 +6,7 @@ import { Container, Notice } from "@/components/ui";
 import { requireUser } from "@/lib/auth";
 import { getOrder } from "@/lib/data";
 import { formatMoney } from "@/lib/money";
+import { describeSize } from "@/lib/colors";
 
 export const metadata: Metadata = { title: "Order confirmed", robots: { index: false } };
 
@@ -59,7 +60,7 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
             <li key={l.variantId} className="tabular flex justify-between gap-4">
               <span>
                 {l.quantity} × {l.productName}
-                {l.size ? `, size ${l.size}` : ""}
+                {l.size ? `, ${describeSize(l.size)}` : ""}
               </span>
               <span>{formatMoney(l.lineTotal)}</span>
             </li>

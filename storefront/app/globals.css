@@ -49,10 +49,16 @@
 @utility font-semicondensed {
   font-stretch: 85%;
 }
+/* Display type is set per design (see the [data-theme] blocks below). */
 @utility headline {
-  font-stretch: 70%;
-  font-weight: 800;
-  letter-spacing: -0.01em;
+  font-family: var(--display-font);
+  font-stretch: var(--display-stretch);
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-tracking);
+  font-style: var(--display-style);
+}
+@utility font-display {
+  font-family: var(--display-font);
 }
 
 @layer base {
@@ -137,7 +143,7 @@
     color: var(--color-paper);
   }
   .btn-ink:hover:not(:disabled) {
-    background: #222d52;
+    background: color-mix(in srgb, var(--color-ink) 86%, white);
   }
   .btn-quiet {
     background: transparent;
@@ -170,4 +176,130 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/*
+  Designs. Each block re-declares the tokens above, so every Tailwind utility (bg-paper, text-ink,
+  bg-cobalt…) follows the design. Unlayered on purpose: these beat Tailwind's layered @theme values.
+  "cobalt" is the accent (actions), "sticker" the highlight (savings), "ink" text and dark surfaces.
+*/
+:root,
+[data-theme="footwear"] {
+  --color-paper: #f2f3ef;
+  --color-white: #ffffff;
+  --color-ink: #17203b;
+  --color-ink-soft: #4a5270;
+  --color-ink-faint: #7a8098;
+  --color-mist: #dcdfe5;
+  --color-cloud: #e7e9ed;
+  --color-cobalt: #2b3fd6;
+  --color-cobalt-deep: #1f2fa8;
+  --color-sticker: #ffd23f;
+  --color-signal: #c42b3a;
+  --color-moss: #1d7a4c;
+  --font-sans: "Archivo Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --display-font: var(--font-sans);
+  --display-stretch: 70%;
+  --display-weight: 800;
+  --display-tracking: -0.01em;
+  --display-style: normal;
+  --radius-tag: 3px;
+  --radius-control: 6px;
+}
+
+[data-theme="electronics"] {
+  --color-paper: #f4f5f7;
+  --color-white: #ffffff;
+  --color-ink: #0f1217;
+  --color-ink-soft: #4a5361;
+  --color-ink-faint: #737c8c;
+  --color-mist: #dde1e7;
+  --color-cloud: #e9ecf1;
+  --color-cobalt: #1f5cff;
+  --color-cobalt-deep: #1745c4;
+  --color-sticker: #b6f23a;
+  --color-signal: #d0312d;
+  --color-moss: #0f7a55;
+  --font-sans: "Space Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
+  --display-font: var(--font-sans);
+  --display-stretch: 100%;
+  --display-weight: 700;
+  --display-tracking: -0.025em;
+  --display-style: normal;
+  --radius-tag: 12px;
+  --radius-control: 10px;
+}
+
+[data-theme="grocery"] {
+  --color-paper: #fbf7ec;
+  --color-white: #ffffff;
+  --color-ink: #1d3a26;
+  --color-ink-soft: #4a5f50;
+  --color-ink-faint: #75867a;
+  --color-mist: #e5dfcc;
+  --color-cloud: #f1ebd9;
+  --color-cobalt: #23773b;
+  --color-cobalt-deep: #195a2c;
+  --color-sticker: #ffcc33;
+  --color-signal: #c43c22;
+  --color-moss: #23773b;
+  --font-sans: "Nunito Variable", ui-rounded, ui-sans-serif, system-ui, sans-serif;
+  --display-font: var(--font-sans);
+  --display-stretch: 100%;
+  --display-weight: 900;
+  --display-tracking: -0.015em;
+  --display-style: normal;
+  --radius-tag: 16px;
+  --radius-control: 12px;
+}
+
+[data-theme="home"] {
+  --color-paper: #f3eee6;
+  --color-white: #fffdf9;
+  --color-ink: #2a2521;
+  --color-ink-soft: #5f564e;
+  --color-ink-faint: #877c72;
+  --color-mist: #ddd4c6;
+  --color-cloud: #e9e1d4;
+  --color-cobalt: #7a4f33;
+  --color-cobalt-deep: #5c3a24;
+  --color-sticker: #ead5b3;
+  --color-signal: #9e3a2b;
+  --color-moss: #4c6b37;
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --display-font: "Fraunces Variable", ui-serif, Georgia, serif;
+  --display-stretch: 100%;
+  --display-weight: 380;
+  --display-tracking: -0.02em;
+  --display-style: normal;
+  --radius-tag: 0px;
+  --radius-control: 2px;
+}
+
+[data-theme="beauty"] {
+  --color-paper: #fbf3f1;
+  --color-white: #ffffff;
+  --color-ink: #3b2331;
+  --color-ink-soft: #6b5060;
+  --color-ink-faint: #957b89;
+  --color-mist: #eedadd;
+  --color-cloud: #f6e6e7;
+  --color-cobalt: #a3405f;
+  --color-cobalt-deep: #82304b;
+  --color-sticker: #f9d3dc;
+  --color-signal: #b0263d;
+  --color-moss: #3c7a5f;
+  --font-sans: "Jost Variable", ui-sans-serif, system-ui, sans-serif;
+  --display-font: "Cormorant Garamond", ui-serif, Georgia, serif;
+  --display-stretch: 100%;
+  --display-weight: 500;
+  --display-tracking: -0.005em;
+  --display-style: normal;
+  --radius-tag: 18px;
+  --radius-control: 999px;
+}
+
+/* The body font follows the design (set on <html>, so nested design wrappers like /admin can reset it). */
+[data-theme] {
+  font-family: var(--font-sans);
 }

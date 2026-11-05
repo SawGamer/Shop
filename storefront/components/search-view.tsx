@@ -9,6 +9,8 @@ import { searchProducts } from "@/lib/data";
 import { pluralize } from "@/lib/format";
 import { formatMoney } from "@/lib/money";
 import { hasActiveFilters, searchHref, SORT_LABELS, SORTS, toggle, type SearchQuery } from "@/lib/search";
+import { getShop } from "@/lib/shop";
+import type { Theme } from "@/lib/themes";
 import type { FacetValue, SearchResponse } from "@/lib/types";
 
 type Props = {
@@ -75,16 +77,28 @@ function FacetGroup({
   );
 }
 
-function SizeFacet({ values, q, href }: { values: FacetValue[]; q: SearchQuery; href: (p: Partial<SearchQuery>) => string }) {
+function SizeFacet({
+  values,
+  q,
+  href,
+  theme,
+}: {
+  values: FacetValue[];
+  q: SearchQuery;
+  href: (p: Partial<SearchQuery>) => string;
+  theme: Theme;
+}) {
+  const { size: title, sizeShort } = theme.labels;
+  const grid = theme.layout.sizeOptions === "grid";
   if (values.length === 0) return null;
   const sorted = [...values].sort((a, b) => compareSizes(a.value, b.value));
   return (
     <fieldset className="border-t border-mist py-4">
-      <legend className="sr-only">Size (EU)</legend>
+      <legend className="sr-only">{title}</legend>
       <p aria-hidden className="mb-2 text-sm font-semibold">
-        Size (EU)
+        {title}
       </p>
-      <ul className="grid grid-cols-4 gap-1.5">
+      <ul className={grid ? "grid grid-cols-4 gap-1.5" : "flex flex-wrap gap-1.5"}>
         {sorted.map((v) => {
           const on = q.size.includes(v.value);
           return (
@@ -94,9 +108,10 @@ function SizeFacet({ values, q, href }: { values: FacetValue[]; q: SearchQuery; 
                 scroll={false}
                 role="checkbox"
                 aria-checked={on}
-                aria-label={`Size ${v.label}, ${v.count} ${v.count === 1 ? "product" : "products"}`}
+                aria-label={`${sizeShort} ${v.label}, ${v.count} ${v.count === 1 ? "product" : "products"}`}
                 className={clsx(
                   "tabular flex h-9 items-center justify-center rounded-tag border text-sm font-semibold",
+                  !grid && "px-3",
                   on ? "border-ink bg-ink text-paper" : "border-mist bg-white hover:border-ink",
                 )}
               >
@@ -114,6 +129,9 @@ export async function SearchView({ query, base, fixedCategory }: Props) {
   const q = fixedCategory ? { ...query, category: fixedCategory } : query;
   const omitCategory = !!fixedCategory;
   const href = (patch: Partial<SearchQuery>) => searchHref(base, q, patch, omitCategory);
+
+  const { theme } = await getShop();
+  const { labels, copy } = theme;
 
   let result: SearchResponse;
   try {
@@ -140,7 +158,7 @@ export async function SearchView({ query, base, fixedCategory }: Props) {
       href: href({ brand: q.brand.filter((x) => x !== b) }),
     });
   }
-  for (const s of q.size) chips.push({ label: `Size ${s}`, href: href({ size: q.size.filter((x) => x !== s) }) });
+  for (const s of q.size) chips.push({ label: `${labels.sizeShort} ${s}`, href: href({ size: q.size.filter((x) => x !== s) }) });
   for (const c of q.color) {
     chips.push({
       label: result.facets.color.find((x) => x.value === c)?.label ?? c,
@@ -198,7 +216,7 @@ export async function SearchView({ query, base, fixedCategory }: Props) {
           hrefFor={(v) => href({ category: q.category === v ? "" : v })}
         />
       )}
-      <SizeFacet values={result.facets.size} q={q} href={href} />
+      <SizeFacet values={result.facets.size} q={q} href={href} theme={theme} />
       <FacetGroup
         title="Brand"
         values={[...result.facets.brand].sort((a, b) => a.label.localeCompare(b.label))}
@@ -206,7 +224,7 @@ export async function SearchView({ query, base, fixedCategory }: Props) {
         hrefFor={(v) => href({ brand: toggle(q.brand, v) })}
       />
       <FacetGroup
-        title="Colour"
+        title={labels.color}
         values={result.facets.color}
         isOn={(v) => q.color.includes(v)}
         hrefFor={(v) => href({ color: toggle(q.color, v) })}
@@ -287,7 +305,7 @@ export async function SearchView({ query, base, fixedCategory }: Props) {
       <section aria-label="Results">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <p className="tabular text-ink-soft" aria-live="polite">
-            {pluralize(result.totalItems, "pair")}
+            {pluralize(result.totalItems, labels.noun[0], labels.noun[1])}
           </p>
           <SortSelect value={sortValue} options={sortOptions} />
         </div>
@@ -299,7 +317,7 @@ export async function SearchView({ query, base, fixedCategory }: Props) {
                 key={c.label + c.href}
                 href={c.href}
                 scroll={false}
-                className="inline-flex items-center gap-1.5 rounded-full bg-ink px-3 py-1 text-sm text-paper hover:bg-[#222d52]"
+                className="inline-flex items-center gap-1.5 rounded-full bg-ink px-3 py-1 text-sm text-paper hover:opacity-90"
               >
                 {c.label}
                 <span aria-hidden>×</span>
@@ -319,10 +337,10 @@ export async function SearchView({ query, base, fixedCategory }: Props) {
 
         {result.items.length === 0 ? (
           <EmptyState
-            title={q.q ? `No shoes match “${q.q}”` : "No shoes match these filters"}
-            action={{ href: base, label: omitCategory ? "Show the whole category" : "Show all shoes" }}
+            title={q.q ? `${copy.noResults} “${q.q}”` : `${copy.noResults} these filters`}
+            action={{ href: base, label: omitCategory ? "Show the whole category" : `Show ${labels.allProducts.toLowerCase()}` }}
           >
-            Remove a filter or try a broader search, like a brand name or “running”.
+            {copy.noResultsHint}
           </EmptyState>
         ) : (
           <ProductGrid products={result.items} />

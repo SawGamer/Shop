@@ -13,7 +13,7 @@ export function NotFoundContent() {
       </p>
       <div className="mt-8 flex flex-wrap gap-3">
         <Link href="/search" className="btn btn-primary">
-          Search shoes
+          Search the shop
         </Link>
         <Link href="/" className="btn btn-quiet">
           Go to the home page

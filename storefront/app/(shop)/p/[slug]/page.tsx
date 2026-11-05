@@ -5,6 +5,7 @@ import { ProductGallery } from "@/components/product-gallery";
 import { VariantPicker } from "@/components/variant-picker";
 import { Container } from "@/components/ui";
 import { getProduct } from "@/lib/data";
+import { getShop } from "@/lib/shop";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -25,9 +26,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProductPage({ params }: Props) {
   const { slug } = await params;
-  const product = await getProduct(slug);
+  const [product, { theme }] = await Promise.all([getProduct(slug), getShop()]);
   if (!product) notFound();
   const category = product.categories[0];
+  const { labels, layout } = theme;
 
   return (
     <Container className="py-6 sm:py-10">
@@ -56,13 +58,19 @@ export default async function ProductPage({ params }: Props) {
       <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:gap-12">
         <ProductGallery images={product.images} name={product.name} />
         <div className="lg:sticky lg:top-6 lg:self-start">
-          <VariantPicker product={product} />
+          <VariantPicker
+            product={product}
+            labels={{ size: labels.size, sizeShort: labels.sizeShort, color: labels.color, choose: labels.choose }}
+            sizeOptions={layout.sizeOptions}
+            colorOptions={layout.colorOptions}
+            buyBox={layout.buyBox}
+          />
         </div>
       </div>
 
       {product.description && (
         <section className="mt-14 max-w-2xl">
-          <h2 className="headline text-2xl">About this shoe</h2>
+          <h2 className="headline text-2xl">{theme.copy.aboutProduct}</h2>
           <div className="mt-4 whitespace-pre-line leading-relaxed text-ink-soft">{product.description}</div>
           <p className="mt-6 text-sm">
             More from{" "}

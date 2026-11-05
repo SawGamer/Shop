@@ -37,6 +37,10 @@ The storefront comes with **five designs for different kinds of shops**: footwea
 | `home` | furniture and decor | warm neutrals, editorial serif, large imagery, finish swatches |
 | `beauty` | cosmetics and fragrance | soft blush palette, elegant serif, shade swatches, routine strip |
 
+| Electronics | Grocery | Home | Beauty |
+|---|---|---|---|
+| ![Electronics design](docs/images/design-electronics.jpg) | ![Grocery design](docs/images/design-grocery.jpg) | ![Home design](docs/images/design-home.jpg) | ![Beauty design](docs/images/design-beauty.jpg) |
+
 - **Switching:** under **Admin → Design**, pick a design, set the shop name, tagline and accent colour, and upload a logo. The storefront switches on the next page load.
 - **What changes:** colours, fonts, header, home page layout, product cards and how variant options are labelled (Size, Capacity, Pack size, Finish or Shade).
 - **What doesn't:** the backend, checkout, admin and data stay the same.

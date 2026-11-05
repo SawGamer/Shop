@@ -40,10 +40,7 @@ class DemoCatalogsTests {
                 assertThat(product.compareAtCents()).isGreaterThan(product.priceCents());
             }
             String image = String.format("seed/%s/%02d.jpg", id, product.image());
-            // TODO(strict): images for the new catalogs are being added; then always require them.
-            if (new ClassPathResource("seed/" + id + "/01.jpg").exists()) {
-                assertThat(new ClassPathResource(image).exists()).as("image %s exists", image).isTrue();
-            }
+            assertThat(new ClassPathResource(image).exists()).as("image %s exists", image).isTrue();
         }
     }
 }

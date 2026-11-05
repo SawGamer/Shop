@@ -1,0 +1,43 @@
+import type { Theme } from "./types";
+
+/** Fresh green and warm yellow, a rounded friendly sans, aisles and quick add. */
+export const grocery: Theme = {
+  id: "grocery",
+  name: "Grocery",
+  description: "Fresh green and warm yellow, a big search bar, aisle tiles and one-tap “Add”.",
+  themeColor: "#1f6e37",
+  preview: { paper: "#fbf7ec", ink: "#1d3a26", accent: "#23773b", highlight: "#ffcc33", font: '"Nunito Variable", sans-serif', sample: "500 g" },
+  labels: {
+    size: "Pack size",
+    sizeShort: "Pack",
+    color: "Variety",
+    choose: "Choose a pack size",
+    noun: ["item", "items"],
+    searchPlaceholder: "Search apples, bread, coffee…",
+    searchLabel: "Search groceries",
+    allProducts: "All groceries",
+  },
+  copy: {
+    heroEyebrow: "Delivered today",
+    heroTitle: "Fresh groceries at your door.",
+    heroSub: "Order by 2 pm for same-day delivery. Free over €50.",
+    primaryCta: "Shop this week's deals",
+    secondaryCta: "Browse all aisles",
+    categoriesTitle: "Shop by aisle",
+    newTitle: "Fresh in",
+    newLink: "See everything",
+    saleTitle: "This week's deals",
+    saleLink: "All deals",
+    emptyCatalog: "The shelves are empty. Add products in the admin area to stock them.",
+    noResults: "Nothing matches",
+    noResultsHint: "Try a broader search, like “cheese” or “fruit”.",
+    emptyCart: "Your basket is empty",
+    emptyCartHint: "Add a few things and they'll wait here while you shop the aisles.",
+    firstOrder: "Start your first basket",
+    aboutProduct: "About this product",
+    footerLine: "Fresh food from local growers and bakers, delivered fast.",
+    metaDescription: "Fresh groceries delivered the same day.",
+    announcement: "Free delivery over €50 · Order by 2 pm for same-day delivery",
+  },
+  layout: { header: "market", card: "market", sizeOptions: "chips", colorOptions: "chips", buyBox: "card" },
+};

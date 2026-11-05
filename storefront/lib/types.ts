@@ -282,3 +282,20 @@ export type StockProblem = {
   requested: number;
   available: number;
 };
+
+export type ShopSettings = {
+  name: string;
+  tagline: string | null;
+  theme: string; // ThemeId; unknown values fall back to the default design
+  accentColor: string | null;
+  logoUrl: string | null;
+  currency: string;
+  updatedAt: string;
+};
+
+export type ShopSettingsUpdate = {
+  name: string;
+  tagline: string | null;
+  theme: string;
+  accentColor: string | null;
+};

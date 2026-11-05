@@ -8,6 +8,7 @@ import { removeCartItem, updateCartItem } from "@/lib/actions/cart";
 import { IDLE } from "@/lib/action-state";
 import { formatMoney } from "@/lib/money";
 import type { CartItem } from "@/lib/types";
+import { describeSize } from "@/lib/colors";
 
 export function CartLine({ item }: { item: CartItem }) {
   const [state, formAction, pending] = useActionState(updateCartItem.bind(null, item.variantId), IDLE);
@@ -26,7 +27,7 @@ export function CartLine({ item }: { item: CartItem }) {
           {item.productName}
         </Link>
         <p className="mt-0.5 text-sm text-ink-soft">
-          {[item.color, item.size && `Size ${item.size}`].filter(Boolean).join(", ")}
+          {[item.color, describeSize(item.size)].filter(Boolean).join(", ")}
         </p>
         <p className="tabular mt-0.5 text-sm text-ink-soft">{formatMoney(item.unitPrice)} each</p>
 
@@ -64,7 +65,7 @@ export function CartLine({ item }: { item: CartItem }) {
         </div>
         {over && (
           <p className="mt-2 text-sm text-signal">
-            {item.available === 0 ? "This size just sold out." : `Only ${item.available} left. Lower the quantity to check out.`}
+            {item.available === 0 ? "This option just sold out." : `Only ${item.available} left. Lower the quantity to check out.`}
           </p>
         )}
         <FormMessage state={state} className="mt-2" />

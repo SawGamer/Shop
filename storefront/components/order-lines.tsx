@@ -4,6 +4,7 @@ import { ProductImage } from "./ui";
 import { COUNTRIES, formatDateTime } from "@/lib/format";
 import { formatMoney } from "@/lib/money";
 import type { Order } from "@/lib/types";
+import { describeSize } from "@/lib/colors";
 
 export function OrderLines({ order, linkProducts = true }: { order: Order; linkProducts?: boolean }) {
   return (
@@ -22,7 +23,7 @@ export function OrderLines({ order, linkProducts = true }: { order: Order; linkP
               <p className="font-semibold">{l.productName}</p>
             )}
             <p className="text-ink-soft">
-              {[l.color, l.size && `Size ${l.size}`, `SKU ${l.sku}`].filter(Boolean).join(", ")}
+              {[l.color, describeSize(l.size), `SKU ${l.sku}`].filter(Boolean).join(", ")}
             </p>
             <p className="tabular text-ink-soft">
               {l.quantity} × {formatMoney(l.unitPrice)}
